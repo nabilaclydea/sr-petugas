@@ -31,7 +31,7 @@ class ReferralCreateFinish extends Component {
                             <Text>Dokumen rujukan anda telah </Text>
                             <Text style={{fontWeight: 'bold'}}>berhasil </Text>
                             <Text>dibuat dengan nomor </Text>
-                            <Text style={{fontWeight: 'bold'}}>#RJK0987342</Text>
+                            <Text style={{fontWeight: 'bold'}}>{'#' + this.props.navigation.getParam('referral').noRujukan}</Text>
                         </Text>
                     </View>
 
@@ -57,6 +57,9 @@ class ReferralCreateFinish extends Component {
                                         NavigationActions.navigate({routeName: 'HomeScreen'}),
                                         NavigationActions.navigate({routeName: 'ReferralCreatePatientDataScreen', params: {referralType: this.state.referralType}}),
                                     ],
+                                    params: {
+                                        nama: this.props.navigation.getParam('user').nama
+                                    }
                                 });
                                 this.props.navigation.dispatch(resetAction);
                             }}
@@ -81,7 +84,14 @@ class ReferralCreateFinish extends Component {
                                 const resetAction = StackActions.reset({
                                     index: 0,
                                     actions: [
-                                        NavigationActions.navigate({routeName: 'HomeScreen'}),
+                                        NavigationActions.navigate(
+                                            {
+                                                routeName: 'HomeScreen',
+                                                params: {
+                                                    nama: this.props.navigation.getParam('user').nama
+                                                }
+                                            }
+                                        ),
                                     ],
                                 });
                                 this.props.navigation.dispatch(resetAction);

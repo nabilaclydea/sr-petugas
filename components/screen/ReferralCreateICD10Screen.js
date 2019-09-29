@@ -1,28 +1,10 @@
 import React, {Component} from 'react';
-import {View, ScrollView, Picker, TouchableOpacity, TextInput, Image, Text, StyleSheet, StatusBar} from 'react-native';
+import {View, ScrollView, FlatList, Modal, TouchableOpacity, TextInput, Image, Text, StyleSheet, StatusBar} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import HealthcareAPI from '../api/HealthcareAPI';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 class ReferralCreateICD10Screen extends Component {
-
-    state = {
-        isDateTimePickerVisible: false,
-        referralType: this.props.navigation.getParam('referralType'),
-        insurancePatientType: this.props.navigation.getParam('insurancePatientType'),
-        selectedItems: [],
-        items: [{id: '1', name: 'Rontgen'}, {id: '2', name: 'MRI'}],
-        icd10: [
-            {code: 'A00', name: 'Kolera'},
-            {code: 'A01.0', name: 'Tifus'},
-            {code: 'A01.1', name: 'Demam Paratipus A'},
-            {code: 'A01.2', name: 'Demam Paratipus B'},
-            {code: 'A01.3', name: 'Demam Paratipus C'},
-            {code: 'A01.4', name: 'Demam Paratipus yang tidak ditentukan'},
-            {code: 'A02', name: 'Infeksi Lain dari Salmonela'},
-            {code: 'A03.0', name: 'Infeksi Shigella Akibat Shigella Disentri'},
-            {code: 'A03.1', name: 'Infeksi Shigella Akibat Shigella Flexneri'},
-        ],
-        selectedICD10: [],
-    };
 
     static navigationOptions = ({navigation}) => {
         return {
@@ -39,6 +21,29 @@ class ReferralCreateICD10Screen extends Component {
             ,
         };
     };
+
+    state = {
+        isDateTimePickerVisible: false,
+        referralType: this.props.navigation.getParam('referralType'),
+        insurancePatientType: this.props.navigation.getParam('insurancePatientType'),
+        selectedItems: [],
+        items: [{id: '1', name: 'Rontgen'}, {id: '2', name: 'MRI'}],
+        icd10: [],
+        selectedICD10: [],
+        visibleModal: false,
+        spinner: false,
+    };
+
+    componentWillMount() {
+        this._icd10();
+    }
+
+    _icd10() {
+        this.setState({spinner: true})
+        HealthcareAPI
+            .get('/diagnosis/icd/list', {params: {type: 10}})
+            .then(response => this.setState({icd10: response.data, spinner: false}))
+    }
 
     _setFormWizardScreen(isActive, index, text, isLast) {
         return <View
@@ -66,72 +71,58 @@ class ReferralCreateICD10Screen extends Component {
         </View>
     };
 
-    _updateSelectedICD10(code, isSelected) {
+    _updateSelectedICD10(icd10) {
         let current = this.state.selectedICD10;
 
-        if (isSelected) {
-            current = current.filter(icd10 => icd10 !== code)
+        if (current.filter(item => item.idDiagnosis === icd10.idDiagnosis).length > 0) {
+            current = current.filter(item => item.idDiagnosis !== icd10.idDiagnosis)
         } else {
-            current.push(code);
+            current.push(icd10);
         }
 
         this.setState({selectedICD10: current});
     };
 
-    _setICD10Screen() {
-        return this.state.icd10.map(icd => {
-            let code = icd.code;
-            let isSelected = this.state.selectedICD10.includes(code);
-
-            return <TouchableOpacity
-                key={code}
-                onPress={() => this._updateSelectedICD10(code, isSelected)}
-                style={{
-                    width: 100 + '%',
-                    height: 80,
-                    backgroundColor: (isSelected ? '#f8f8f8' : '#ffffff'),
-                    borderBottomColor: '#f8f8f8',
-                    borderBottomWidth: 1
-                }}>
-                <View style={{
-                    flexDirection: 'row',
-                    height: 100 + '%',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginHorizontal: 5 + '%'
-                }}>
-                    <View style={{width: 20 + '%', justifyContent: 'center'}}>
-                        <Text>{code}</Text>
-                    </View>
-                    <View style={{width: 70 + '%', justifyContent: 'center'}}>
-                        <Text>{icd.name}</Text>
-                    </View>
-                    <View style={{width: 10 + '%', justifyContent: 'center'}}>
-                        <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-                            <View style={{
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                width: 20,
-                                height: 20,
-                                backgroundColor: (isSelected ? '#00818c' : '#ffffff'),
-                                borderColor: (isSelected ? '#00818c' : '#cacaca'),
-                                borderRadius: 3,
-                                borderWidth: 2
-                            }}>
-                                {isSelected ?
-                                    <Image style={{width: 10, height: 10}}
-                                           source={require('../../assets/images/tick.png')}/> : null}
-                            </View>
-                        </View>
-                    </View>
+    _renderICD10(item) {
+        let isSelected = (this.state.selectedICD10.filter(icd10 => icd10.idDiagnosis === item.idDiagnosis).length > 0);
+        return <TouchableOpacity
+            onPress={() => this._updateSelectedICD10(item)}
+            style={{
+                width: 100 + '%',
+                height: 80,
+                backgroundColor: '#ffffff',
+                backgroundColor: (isSelected ? '#f8f8f8' : '#ffffff'),
+                borderBottomColor: '#f8f8f8',
+                borderBottomWidth: 1
+            }}>
+            <View style={{
+                flexDirection: 'row',
+                height: 100 + '%',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginHorizontal: 5 + '%'
+            }}>
+                <View style={{ width: 20 + '%', justifyContent: 'center' }}>
+                    <Text>{item.kodeDiagnosis}</Text>
                 </View>
-            </TouchableOpacity>
-        });
+                <View style={{ width: 80 + '%', justifyContent: 'center' }}>
+                    <Text>{item.namaDiagnosis}</Text>
+                </View>
+            </View>
+        </TouchableOpacity>
+    }
+
+    _setICD10Screen() {
+        return <FlatList
+            data={this.state.icd10}
+            renderItem={({ item }) => this._renderICD10(item)}
+            keyExtractor={(item) => item.idDiagnosis}
+        />
     };
 
     _setSelectedICD10Screen() {
         return this.state.selectedICD10.map(icd10 => {
-            return <TouchableOpacity onPress={() => this._updateSelectedICD10(icd10, true)} key={icd10}
+            return <TouchableOpacity onPress={() => this._updateSelectedICD10(icd10)} key={icd10.idDiagnosis}
                                      style={{justifyContent: 'center', width: 100, height: 70}}>
                 <View style={{justifyContent: 'flex-end', width: 75, height: 35}}>
                     <View style={{
@@ -146,7 +137,7 @@ class ReferralCreateICD10Screen extends Component {
                             color: '#000000',
                             fontSize: 10,
                             fontWeight: 'bold'
-                        }}>{icd10}</Text>
+                        }}>{icd10.kodeDiagnosis}</Text>
                     </View>
                     <View style={{
                         position: 'absolute',
@@ -173,7 +164,104 @@ class ReferralCreateICD10Screen extends Component {
 
         return (
             <View style={styles.firstLayer}>
+                <Spinner
+                    animation={'slide'}
+                    visible={this.state.spinner}
+                    textContent={'Mengambil Data ICD 10'}
+                    textStyle={{ color: '#ffffff' }}
+                />
+                <Modal transparent={true} visible={this.state.visibleModal} onRequestClose={() => {this.setState({visibleModal: false})}}>
+                    <TouchableOpacity activeOpacity={1} onPress={() => this.setState({visibleModal: false})} style={{flex: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.2)'}}>
+                        <TouchableOpacity activeOpacity={1} style={{width: 80 + '%', height: 50 + '%', backgroundColor: '#ffffff', borderRadius: 10}}>
+                                <View style={{flexDirection: 'column', justifyContent: 'space-around'}}>
+                                    <View style={{justifyContent: 'center', alignItems: 'center', height: 100 + '%'}}>
+                                        <Text style={{fontSize: 20, textAlign: 'center'}}>
+                                            Apakah anda yakin telah selesai membuat rujukan?
+                                        </Text>
+                                    </View>
+                                    <View style={{flexDirection: 'row', position: 'absolute', bottom: 0}}>
+                                        <TouchableOpacity 
+                                            onPress={() => 
+                                                {
+                                                    this.setState({visibleModal: false, spinner: true});
+                                                    let poli = null;
+                                                    let emergency = null;
+                                                    let form = this.props.navigation.getParam('referralForm');
+                                                    let docPemeriksaanDarah = this.props.navigation.getParam('docPemeriksaanDarah');
+                                                    let docPemeriksaanLain = this.props.navigation.getParam('docPemeriksaanLain');
+                                                    
+                                                    if(this.state.referralType <= 1) {
+                                                        poli = form;
+                                                    } else {
+                                                        emergency = form;
+                                                    }
+                                                    HealthcareAPI.post(
+                                                        '/referral/create',
+                                                        {
+                                                            referralPoliForm: poli,
+                                                            referralEmergencyForm: emergency, 
+                                                            icd9: this.props.navigation.getParam('icd9'),
+                                                            icd10: this.state.selectedICD10
+                                                        }
+                                                    )
+                                                    .then(response => {
+                                                        let formData = new FormData();
+                                                        formData.append("docPemeriksaanDarah", {
+                                                            name: docPemeriksaanDarah.fileName,
+                                                            type: docPemeriksaanDarah.type,
+                                                            uri: docPemeriksaanDarah.uri
+                                                        });
+                                                        formData.append("docPemeriksaanLain", {
+                                                            name: docPemeriksaanLain.fileName,
+                                                            type: docPemeriksaanLain.type,
+                                                            uri: docPemeriksaanLain.uri
+                                                        });
 
+                                                        let referral = response.data;
+                                                        let noRekamMedis = referral.noRekamMedis;
+
+                                                        let url = '/referral/upload/' + noRekamMedis;
+                                                        let config = {
+                                                            headers: {
+                                                                'Content-type': 'multipart/form-data'
+                                                            }
+                                                        };
+
+                                                        HealthcareAPI
+                                                            .post(url, formData, config)
+                                                            .then(() => {
+                                                                this.setState({spinner: false});
+                                                                navigate('ReferralCreateFinish', {
+                                                                    user: this.props.navigation.getParam('user'),
+                                                                    referral: referral,
+                                                                    referralType: this.state.referralType,
+                                                                    insurancePatientType: this.state.insurancePatientType
+                                                                })
+                                                            })
+                                                            .catch(error => console.log(error));
+                                                    })
+                                                    .catch(error => console.log(error.response.data))
+                                                }
+                                            }
+                                            style={{width: 50 + '%', backgroundColor: '#28c667', borderBottomLeftRadius: 10}}>
+                                            <Text 
+                                                style={{paddingVertical: 10, textAlign: 'center', fontWeight: 'bold', color: 'white'}}>
+                                                Ya
+                                            </Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity 
+                                            onPress={() => this.setState({visibleModal: false})} 
+                                            style={{width: 50 + '%', backgroundColor: 'grey', borderBottomRightRadius: 10}}>
+                                            <Text 
+                                                style={{paddingVertical: 10, textAlign: 'center', fontWeight: 'bold', color: 'white'}}>
+                                                Tidak
+                                            </Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                        </TouchableOpacity>
+                    </TouchableOpacity>
+                </Modal>
                 <View style={{
                     flexDirection: 'row',
                     justifyContent: 'flex-end',
@@ -213,12 +301,7 @@ class ReferralCreateICD10Screen extends Component {
 
                     <View style={{alignItems: 'center', width: 100 + '%', minHeight: 55}}>
                         <TouchableOpacity
-                            onPress={() =>
-                                navigate('ReferralCreateFinish', {
-                                        referralType: this.state.referralType,
-                                        insurancePatientType: this.state.insurancePatientType
-                                    }
-                                )}
+                            onPress={() => this.setState({visibleModal: true})}
                             style={{
                                 justifyContent: 'center',
                                 alignItems: 'center',

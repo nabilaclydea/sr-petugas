@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
     Alert,
     View,
@@ -13,31 +13,11 @@ import {
 } from 'react-native';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import Spinner from 'react-native-loading-spinner-overlay';
+import HealthcareAPI from '../api/HealthcareAPI';
+import axios from 'axios';
 
 class ReferralCreatePatientDataScreen extends Component {
-    state = {
-        isDateTimePickerVisible: false,
-        referralType: this.props.navigation.getParam('referralType'),
-        insurancePatientType: 1,
-        isSearched: false,
-        isSelected: false,
-        spinner: false,
-        identityNumberChanged: '',
-        identityNumber: '',
-        patientSearchResult: {},
-        patientSelected: {},
-        isPatientFound: false,
-        inputRequired: [true, true, true, true, true],
-        inputRequiredData: ['insurance_number', 'name', 'mobile_phone', 'address', 'postal_code'],
-        inputRequiredDataRead: ['Nomor BPJS/Asuransi', 'Nama', 'Nomor Telepon Pribadi', 'Alamat', 'Kode Pos'],
-        patients: [
-            {identity_number: '1011121314151617', insurance_number: '7502193810123', identity_type: 1, name: 'Budi Sudrajat', gender: 1, birth_place: 1, birth_date: new Date(1996, 9, 11), mobile_phone: '081345678910', home_phone: '0215378765', religion: 1, education_level: 1, married_status: 1, nationality: 1, address: 'Jl Jawa sektor 14', province: 1, city: 1, district: 1, sub_district: 1, postal_code: '1214'},
-            {identity_number: '1234567890', insurance_number: '7402163210345', identity_type: 1, name: 'Budi', gender: 1, birth_place: 1, birth_date: new Date(1996, 9, 11), mobile_phone: '081345678910', home_phone: '0215378765', religion: 1, education_level: 1, married_status: 1, nationality: 1, address: 'Jl Jawa sektor 14', province: 1, city: 1, district: 1, sub_district: 1, postal_code: '1214'},
-            {identity_number: '123123123123', insurance_number: '7623155810166', identity_type: 1, name: 'Sudrajat', gender: 1, birth_place: 1, birth_date: new Date(1996, 9, 11), mobile_phone: '081345678910', home_phone: '0215378765', religion: 1, education_level: 1, married_status: 1, nationality: 1, address: 'Jl Jawa sektor 14', province: 1, city: 1, district: 1, sub_district: 1, postal_code: '1214'}
-        ],
-    };
-
-    static navigationOptions = ({navigation}) => {
+    static navigationOptions = ({ navigation }) => {
         return {
             headerStyle: {
                 color: '#ffffff',
@@ -45,26 +25,197 @@ class ReferralCreatePatientDataScreen extends Component {
             headerTintColor: '#000000',
             headerTitle:
                 <View>
-                    <Text style={{fontSize: 18, fontWeight: 'bold', color: '#000000'}}>
+                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#000000' }}>
                         {navigation.getParam('referralType') <= 1 ? 'Rujuk Poli' : 'Rujuk Emergency'}
                     </Text>
                 </View>
             ,
         };
     };
+    
+    state = {
+        isDateTimePickerVisible: false,
+        referralType: this.props.navigation.getParam('referralType'),
+        insurancePatientType: 1,
+        isSearched: false,
+        isFound: false,
+        isSelected: false,
+        spinner: false,
+        identityNumberChanged: '',
+        identityNumber: '',
+        patientSearchResult: {},
+        patientSelected: {},
+        birthDate: new Date(),
+        isPatientFound: false,
+        isPatientNotFoundSelected: false,
+        required: {},
+        inputRequired: [true, true, true, true],
+        inputRequiredData: ['name', 'noHandphone', 'alamat', 'kodePos'],
+        inputRequiredDataRead: ['Nama', 'Nomor Telepon Pribadi', 'Alamat', 'Kode Pos'],
+        referralForm: { rujukan: {}, pasien: {}, jadwalPasien: {}, rekamMedis: {}, docPemeriksaanDarah: {}, docPemeriksaanLain: {} },
+        insuranceType: [],
+        identityType: [],
+        gender: [],
+        religion: [],
+        education: [],
+        marriage: [],
+        province: [],
+        city: [],
+    };
 
-    _showDateTimePicker = () => this.setState({isDateTimePickerVisible: true});
 
-    _hideDateTimePicker = () => this.setState({isDateTimePickerVisible: false});
+
+    componentWillMount() {
+        this._newPatient();
+    }
+
+    _newPatient() {
+        let referralForm = { rujukan: {}, pasien: {}, jadwalPasien: {}, rekamMedis: {}, docPemeriksaanDarah: {}, docPemeriksaanLain: {} };
+        this.setState({referralForm: referralForm});
+        
+        axios
+            .all([this._init(), this._insuranceType(), this._identityType(), this._gender(),
+            this._religion(), this._education(), this._marriage(), this._province(), this._city()])
+    }
+
+    _init() {
+        let url = '';
+        if (this.state.referralType <= 1) {
+            url = '/referral/poli/init';
+        } else {
+            url = '/referral/emergency/init'
+        }
+        HealthcareAPI
+            .get(url)
+            .then(response => 
+                {
+                    let tmp = response.data;
+                    if(this.state.referralType <= 1) {
+                        tmp.rujukan.isRujukEmergency = 0;
+                    } else {
+                        tmp.rujukan.isRujukEmergency = 1;
+                    }
+                    this.setState({ referralForm: tmp});
+                }
+            )
+    }
+
+    _insuranceType() {
+        HealthcareAPI
+            .get('/patient/type/list')
+            .then(response => 
+                {
+                    let list = response.data;
+                    let tmp = this.state.referralForm;
+                    tmp.rujukan.statusBayar = list[0].idJenisPasien;
+                    this.setState({ insuranceType: list, referralForm: tmp});
+                }
+            )
+    }
+
+    _identityType() {
+        HealthcareAPI
+            .get('/patient/identity/type/list')
+            .then(response => 
+                {
+                    let list = response.data;
+                    let tmp = this.state.referralForm;
+                    tmp.pasien.idJenisIdentitas = list[0].idJenisIdentitas;
+                    this.setState({ identityType: list, referralForm: tmp});
+                }
+            )
+    }
+
+    _gender() {
+        HealthcareAPI
+            .get('/gender/list')
+            .then(response => 
+                {
+                    let list = response.data;
+                    let tmp = this.state.referralForm;
+                    tmp.pasien.idJenisKelamin = list[0].idJenisKelamin;
+                    this.setState({ gender: list, referralForm: tmp });
+                }
+            )
+    }
+
+    _religion() {
+        HealthcareAPI
+            .get('/religion/list')
+            .then(response => 
+                {
+                    let list = response.data;
+                    let tmp = this.state.referralForm;
+                    tmp.pasien.idAgama = list[0].idAgama;
+                    this.setState({ religion: list, referralForm: tmp });
+                }
+            )
+    }
+
+    _education() {
+        HealthcareAPI
+            .get('/education/list')
+            .then(response => 
+                {
+                    let list = response.data;
+                    let tmp = this.state.referralForm;
+                    tmp.pasien.idJenjangPendidikan = list[0].idJenjangPendidikan;
+                    this.setState({ education: list, referralForm: tmp });
+                }
+            )
+    }
+
+    _marriage() {
+        HealthcareAPI
+            .get('/marriage/list')
+            .then(response => 
+                {
+                    let list = response.data;
+                    let tmp = this.state.referralForm;
+                    tmp.pasien.idStatusNikah = list[0].idStatusNikah;
+                    this.setState({ marriage: list, referralForm: tmp });
+                }
+            )
+    }
+
+    _province() {
+        HealthcareAPI
+            .get('/province/list')
+            .then(response => 
+                {
+                    let list = response.data;
+                    let tmp = this.state.referralForm;
+                    tmp.pasien.idProvinsi = list[0].idProvinsi;
+                    this.setState({ province: list, referralForm: tmp });
+                }
+            )
+    }
+
+    _city() {
+        HealthcareAPI
+            .get('/city/list')
+            .then(response => 
+                {
+                    let list = response.data;
+                    let tmp = this.state.referralForm;
+                    tmp.pasien.idKota = list[0].idKota;
+                    tmp.pasien.tempatLahir = list[0].idKota;
+                    this.setState({ city: list, referralForm: tmp });
+                }
+            )
+    }
+
+    _showDateTimePicker = () => this.setState({ isDateTimePickerVisible: true });
+
+    _hideDateTimePicker = () => this.setState({ isDateTimePickerVisible: false });
 
     _handleDatePicked = (date) => {
-        console.log('A date has been picked: ', date);
         this._hideDateTimePicker();
     };
 
     _setFormWizardScreen(isActive, index, text, isLast) {
         return <View
-            style={{flexDirection: 'row', alignItems: 'center', marginLeft: 10, marginRight: (isLast ? 10 : 0)}}>
+            style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10, marginRight: (isLast ? 10 : 0) }}>
             <View style={{
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -73,7 +224,7 @@ class ReferralCreatePatientDataScreen extends Component {
                 height: 15,
                 borderRadius: 100
             }}>
-                <Text style={{color: '#ffffff', fontSize: 8}}>
+                <Text style={{ color: '#ffffff', fontSize: 8 }}>
                     {index}
                 </Text>
             </View>
@@ -84,92 +235,70 @@ class ReferralCreatePatientDataScreen extends Component {
                 marginLeft: 5
             }}>{text}</Text>
             {isLast ? null : <View
-                style={{backgroundColor: (isActive ? '#00818c' : '#c4c4c4'), width: 20, height: 2, marginLeft: 5}}/>}
+                style={{ backgroundColor: (isActive ? '#00818c' : '#c4c4c4'), width: 20, height: 2, marginLeft: 5 }} />}
         </View>
     };
 
     _searchPatient() {
-        this.setState({spinner: !this.state.spinner, identityNumber: this.state.identityNumberChanged});
+        this.setState({ spinner: !this.state.spinner, identityNumber: this.state.identityNumberChanged, isPatientNotFoundSelected: false });
 
-        setTimeout(() => {
-            let patient = {
-                insuranceNumber: '',
-                identity_type: 1,
-                name: '',
-                gender: 1,
-                birth_place: 1,
-                birth_date: new Date(),
-                mobile_phone: '',
-                home_phone: '',
-                religion: 1,
-                education_level: 1,
-                married_status: 1,
-                nationality: 1,
-                address: '',
-                province: 1,
-                city: 1,
-                district: 1,
-                sub_district: 1,
-                postal_code: '',
-            };
-
-            let isPatientFound = false;
-            let identityNumber = this.state.identityNumberChanged;
-
-            let getPatient = this.state.patients.filter(function (patient) {
-                return patient.identity_number == identityNumber;
-            });
-
-            if (getPatient.length > 0) {
-                patient = getPatient[0];
-                isPatientFound = true;
-            }
-
-            this.setState({
-                patientSelected: patient,
-                isPatientFound: isPatientFound,
-                spinner: !this.state.spinner,
-                isSelected: true,
-                // isSearched: true
-            });
-        }, 3000);
+        HealthcareAPI
+            .get('/patient', {
+                params: {
+                    identity_number: this.state.identityNumberChanged
+                }
+            })
+            .then(response => {
+                let tmp = this.state.referralForm;
+                let patientFound = false;
+                if (response.data.idPasien !== null) {
+                    tmp.pasien = response.data;
+                    patientFound = true;
+                    this.setState({referralForm: tmp});
+                } else {
+                    this._newPatient();
+                }
+                this.setState({ spinner: false, isSearched: true, isFound: patientFound});
+            })
     };
 
     _setSearchResultScreen() {
         if (this.state.isSearched) {
-            return <View style={{width: 100 + '%', minHeight: 150, backgroundColor: '#ffffff', marginTop: 10}}>
-                <View style={{margin: 5 + '%'}}>
-                    <Text style={{color: '#000000', fontSize: 12, fontWeight: 'bold'}}>Hasil Pencarian</Text>
-                    <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 10}}>
+            return <View style={{ width: 100 + '%', minHeight: 150, backgroundColor: '#ffffff', marginTop: 10 }}>
+                <View style={{ margin: 5 + '%' }}>
+                    <Text style={{ color: '#000000', fontSize: 12, fontWeight: 'bold' }}>Hasil Pencarian</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                         {
-                            this.state.isPatientFound
+                            this.state.isFound
                                 ?
-                                <Image style={{width: 80, height: 80, borderRadius: 4}}
-                                       source={require('../../assets/images/patient.jpg')}/>
+                                <Image style={{ width: 80, height: 80, borderRadius: 4 }}
+                                    source={require('../../assets/images/patient.jpg')} />
                                 :
-                                <View style={{justifyContent: 'center', height: 80}}>
-                                    <Text style={{color: '#000000', fontSize: 10}}>Maaf, nomor identitas yang anda isi
+                                <View style={{ justifyContent: 'center', height: 80 }}>
+                                    <Text style={{ color: '#000000', fontSize: 10 }}>Maaf, nomor identitas yang anda isi
                                         tidak ditemukan</Text>
                                 </View>
                         }
                         {
-                            this.state.isPatientFound
+                            this.state.isFound
                                 ?
-                                <View style={{marginLeft: 20}}>
-                                    <Text style={{color: '#000000', fontSize: 14, fontWeight: 'bold'}}>Budi
-                                        Sudrajat</Text>
+                                <View style={{ marginLeft: 20 }}>
+                                    <Text style={{ color: '#000000', fontSize: 14, fontWeight: 'bold' }}>{this.state.referralForm.pasien.nama}</Text>
                                     <Text
-                                        style={{color: '#cacaca', fontSize: 10, marginTop: 10}}>1011121314151617</Text>
+                                        style={{ color: '#cacaca', fontSize: 10, marginTop: 10 }}>{this.state.referralForm.pasien.noIdentitas}</Text>
                                 </View>
                                 :
                                 null
                         }
                         <TouchableOpacity
-                            onPress={() => this.setState({
-                                isSearched: !this.state.isSearched,
-                                isSelected: true,
-                                patientSelected: this.state.patientSearchResult
-                            })}
+                            onPress={() => {
+                                this.setState({isSelected: true});
+                                if (this.state.isFound) {
+                                    this._submitNewPatient();
+                                } else {
+                                    this.setState({ isPatientNotFoundSelected: true, isSearched: false});
+                                }
+                            }}
                             style={{
                                 position: 'absolute',
                                 right: 0,
@@ -181,8 +310,8 @@ class ReferralCreatePatientDataScreen extends Component {
                                 borderRadius: 5
                             }}
                         >
-                            <Text style={{color: '#ffffff', fontSize: 12, fontWeight: 'bold'}}>
-                                {this.state.isPatientFound ? 'Pilih' : 'Isi Manual'}
+                            <Text style={{ color: '#ffffff', fontSize: 12, fontWeight: 'bold' }}>
+                                {this.state.isFound ? 'Pilih' : 'Isi Manual'}
                             </Text>
                         </TouchableOpacity>
                     </View>
@@ -194,158 +323,123 @@ class ReferralCreatePatientDataScreen extends Component {
     _setPatientDataScreen() {
         let patient = this.state.patientSelected;
 
-        if (this.state.isSelected) {
+        if (this.state.isPatientNotFoundSelected) {
             return <View>
-                <View style={{width: 100 + '%', minHeight: 610, backgroundColor: '#ffffff', marginTop: 10}}>
-                    <View style={{margin: 5 + '%'}}>
-                        {!this.state.isPatientFound && <View style={{alignItems: 'center'}}>
-                            <Text style={{color: '#f05d5e', textAlign: 'center'}}>Pasien tidak ditemukan dalam sistem,
+                <View style={{ width: 100 + '%', minHeight: 450, backgroundColor: '#ffffff', marginTop: 10 }}>
+                    <View style={{ margin: 5 + '%' }}>
+                        {!this.state.isPatientFound && <View style={{ alignItems: 'center' }}>
+                            <Text style={{ color: '#f05d5e', textAlign: 'center' }}>Pasien tidak ditemukan dalam sistem,
                                 silakan isi data pasien secara manual.</Text>
                         </View>}
-                        <View style={{marginTop: (this.state.isPatientFound ? 0 : 15)}}>
-                            <Text style={{color: '#cacaca'}}>
-                                Nomor BPJS
-                                <Text style={{color: '#f05d5e'}}> *</Text>
-                            </Text>
-                            <TextInput
-                                ref={(input0) => {
-                                    this.input0 = input0
-                                }}
-                                keyboardType={'numeric'}
-                                placeholder={'Nomor BPJS'}
-                                value={patient.insurance_number}
-                                onChangeText={(text) => {
-                                    patient.insurance_number = text;
-                                    this.setState({patient: patient});
-                                }}
-                                style={{
-                                    marginLeft: 4,
-                                    borderBottomColor: (this.state.inputRequired[0] ? '#c4c4c4' : '#f05d5e'),
-                                    borderBottomWidth: 1
-                                }}
-                            />
-                            {!this.state.inputRequired[0] &&
-                            <Text style={{color: '#f05d5e', fontSize: 12, marginLeft: 4}}>Masukkan nomor bpjs/asuransi
-                                pasien</Text>}
-                        </View>
-                        <View style={{marginTop: 15}}>
-                            <Text style={{color: '#cacaca'}}>
-                                Jenis Identitas
-                                <Text style={{color: '#f05d5e'}}> *</Text>
-                            </Text>
-                            <View style={{width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1}}>
-                                <Picker
-                                    selectedValue={patient.identity_type}
-                                    onValueChange={(itemValue) => {
-                                        patient.identity_type = itemValue;
-                                        this.setState({patient: patient});
-                                    }}
-                                >
-                                    <Picker.Item label={'KTP'} value={1}/>
-                                    <Picker.Item label={'SIM'} value={2}/>
-                                    <Picker.Item label={'Paspor'} value={3}/>
-                                </Picker>
-                            </View>
-                        </View>
-                        <View style={{marginTop: 15}}>
-                            <Text style={{color: '#cacaca'}}>
+                        <View style={{ marginTop: 15 }}>
+                            <Text style={{ color: '#cacaca' }}>
                                 Nama
-                                <Text style={{color: '#f05d5e'}}> *</Text>
+                                <Text style={{ color: '#f05d5e' }}> *</Text>
                             </Text>
                             <TextInput
                                 ref={(input1) => {
                                     this.input1 = input1
                                 }}
                                 placeholder={'Nama'}
-                                value={patient.name}
                                 onChangeText={(text) => {
-                                    patient.name = text;
-                                    this.setState({patient: patient});
+                                    let tmp = this.state.referralForm;
+                                    tmp.pasien.nama = text;
+                                    this.setState({ referralForm: tmp });
                                 }}
                                 style={{
                                     marginLeft: 4,
-                                    borderBottomColor: (this.state.inputRequired[1] ? '#c4c4c4' : '#f05d5e'),
+                                    borderBottomColor: (this._isError('nama') ? '#c4c4c4' : '#f05d5e'),
                                     borderBottomWidth: 1
-                                }}/>
-                            {!this.state.inputRequired[1] &&
-                            <Text style={{color: '#f05d5e', fontSize: 12, marginLeft: 4}}>Masukkan nama pasien</Text>}
+                                }} />
+                            {!this._isError('nama') &&
+                                <Text style={{ color: '#f05d5e', fontSize: 12, marginLeft: 4 }}>Masukkan nama pasien</Text>}
                         </View>
-                        <View style={{marginTop: 15}}>
-                            <Text style={{color: '#cacaca'}}>
+                        <View style={{ marginTop: 15 }}>
+                            <Text style={{ color: '#cacaca' }}>
                                 Jenis Kelamin
-                                <Text style={{color: '#f05d5e'}}> *</Text>
+                                <Text style={{ color: '#f05d5e' }}> *</Text>
                             </Text>
-                            <View style={{width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1}}>
+                            <View style={{ width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1 }}>
                                 <Picker
-                                    selectedValue={patient.gender}
+                                    selectedValue={this.state.referralForm.pasien.idJenisKelamin}
                                     onValueChange={(itemValue) => {
-                                        patient.gender = itemValue;
-                                        this.setState({patient: patient})
+                                        let tmp = this.state.referralForm;
+                                        tmp.pasien.idJenisKelamin = itemValue;
+                                        this.setState({ referralForm: tmp })
                                     }}
                                 >
-                                    <Picker.Item label={'Perempuan'} value={0}/>
-                                    <Picker.Item label={'Laki-laki'} value={1}/>
+                                    {
+                                        this.state.gender.map(type =>
+                                            <Picker.Item label={type.namaJenisKelamin} value={type.idJenisKelamin} key={type.idJenisKelamin} />
+                                        )
+                                    }
                                 </Picker>
                             </View>
                         </View>
-                        <View style={{marginTop: 15}}>
-                            <Text style={{color: '#cacaca'}}>
+                        <View style={{ marginTop: 15 }}>
+                            <Text style={{ color: '#cacaca' }}>
                                 Tempat Lahir
-                                <Text style={{color: '#f05d5e'}}> *</Text>
+                                <Text style={{ color: '#f05d5e' }}> *</Text>
                             </Text>
-                            <View style={{width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1}}>
+                            <View style={{ width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1 }}>
                                 <Picker
-                                    selectedValue={patient.birth_place}
+                                    selectedValue={this.state.referralForm.pasien.tempatLahir}
                                     onValueChange={(itemValue) => {
-                                        patient.birth_place = itemValue;
-                                        this.setState({patent: patient});
+                                        let tmp = this.state.referralForm;
+                                        tmp.pasien.tempatLahir = itemValue;
+                                        this.setState({ referralForm: tmp });
                                     }}
                                 >
-                                    <Picker.Item label={'Jakarta Barat'} value={0}/>
-                                    <Picker.Item label={'Tangerang Selatan'} value={1}/>
+                                    {
+                                        this.state.city.map(type =>
+                                            <Picker.Item label={type.namaKota} value={type.namaKota} key={type.idKota} />
+                                        )
+                                    }
                                 </Picker>
                             </View>
                         </View>
-                        <View style={{marginTop: 15}}>
-                            <Text style={{color: '#cacaca'}}>
+                        <View style={{ marginTop: 15 }}>
+                            <Text style={{ color: '#cacaca' }}>
                                 Tanggal Lahir
-                                <Text style={{color: '#f05d5e'}}> *</Text>
+                                <Text style={{ color: '#f05d5e' }}> *</Text>
                             </Text>
-                            <View style={{borderBottomColor: '#c4c4c4', borderBottomWidth: 1}}>
+                            <View style={{ borderBottomColor: '#c4c4c4', borderBottomWidth: 1 }}>
                                 <TouchableOpacity onPress={this._showDateTimePicker}>
                                     <TextInput
-                                        value={patient.birth_date.getDate() + ' / ' + (patient.birth_date.getMonth() + 1) + ' / ' + patient.birth_date.getFullYear()}
+                                        value={this.state.birthDate.getDate() + ' / ' + (this.state.birthDate.getMonth() + 1) + ' / ' + this.state.birthDate.getFullYear()}
                                         editable={false}
                                         selectTextOnFocus={false}
-                                        style={{color: '#000000', marginLeft: 5}}/>
+                                        style={{ color: '#000000', marginLeft: 5 }} />
                                 </TouchableOpacity>
                             </View>
                             <DateTimePicker
-                                date={patient.birth_date}
+                                date={this.state.birthDate}
                                 isVisible={this.state.isDateTimePickerVisible}
                                 onConfirm={(date) => {
-                                    patient.birth_date = date;
-                                    this.setState({patent: patient});
+                                    let tmp = this.state.birthDate;
+                                    tmp = date;
+                                    let tmp2 = this.state.referralForm;
+                                    tmp2.pasien.tanggalLahir = tmp.getFullYear() + '-' + this._doubleDigit((tmp.getMonth() + 1)) + '-' + this._doubleDigit(tmp.getDate());
                                     this._hideDateTimePicker;
-                                    this.setState({isDateTimePickerVisible: false});
+                                    this.setState({ isDateTimePickerVisible: false, birthDate: tmp, referralForm: tmp2 });
                                 }}
                                 onCancel={this._hideDateTimePicker}
                             />
                         </View>
-                        <View style={{marginTop: 15}}>
-                            <Text style={{color: '#cacaca'}}>Umur</Text>
-                            <TextInput value={'29 tahun 1 bulan 6 hari'} editable={false} selectTextOnFocus={false}
-                                       style={{color: '#000000', marginLeft: 5}}/>
+                        <View style={{ marginTop: 15 }}>
+                            <Text style={{ color: '#cacaca' }}>Umur</Text>
+                            <TextInput value={this._age(this.state.birthDate)} editable={false} selectTextOnFocus={false}
+                                style={{ color: '#000000', marginLeft: 5 }} />
                         </View>
                     </View>
                 </View>
 
-                <View style={{width: 100 + '%', minHeight: 200, backgroundColor: '#ffffff', marginTop: 10}}>
-                    <View style={{margin: 5 + '%'}}>
+                <View style={{ width: 100 + '%', minHeight: 200, backgroundColor: '#ffffff', marginTop: 10 }}>
+                    <View style={{ margin: 5 + '%' }}>
                         <View>
-                            <Text style={{color: '#cacaca'}}>
+                            <Text style={{ color: '#cacaca' }}>
                                 Telepon Pribadi
-                                <Text style={{color: '#f05d5e'}}> *</Text>
+                                <Text style={{ color: '#f05d5e' }}> *</Text>
                             </Text>
                             <TextInput
                                 ref={(input2) => {
@@ -353,138 +447,143 @@ class ReferralCreatePatientDataScreen extends Component {
                                 }}
                                 keyboardType={'numeric'}
                                 placeholder={'Contoh: 081234567890'}
-                                value={patient.mobile_phone}
                                 onChangeText={(text) => {
-                                    patient.mobile_phone = text;
-                                    this.setState({patient: patient});
+                                    let tmp = this.state.referralForm;
+                                    tmp.pasien.noHandphone = text;
+                                    this.setState({ referralForm: tmp });
                                 }}
                                 style={{
                                     marginLeft: 4,
-                                    borderBottomColor: (this.state.inputRequired[2] ? '#c4c4c4' : '#f05d5e'),
+                                    borderBottomColor: (this._isError('noHandphone') ? '#c4c4c4' : '#f05d5e'),
                                     borderBottomWidth: 1
                                 }}
                             />
-                            {!this.state.inputRequired[2] &&
-                            <Text style={{color: '#f05d5e', fontSize: 12, marginLeft: 4}}>Masukkan nomor telepon pribadi
+                            {!this._isError('noHandphone') &&
+                                <Text style={{ color: '#f05d5e', fontSize: 12, marginLeft: 4 }}>Masukkan nomor telepon pribadi
                                 pasien atau keluarga/kerabat</Text>}
                         </View>
-                        <View style={{marginTop: 15}}>
-                            <Text style={{color: '#cacaca'}}>Telepon Rumah</Text>
+                        <View style={{ marginTop: 15 }}>
+                            <Text style={{ color: '#cacaca' }}>Telepon Rumah</Text>
                             <TextInput
                                 keyboardType={'numeric'}
                                 placeholder={'Contoh: 0217567890'}
-                                value={patient.home_phone}
                                 onChangeText={(text) => {
-                                    patient.home_phone = text;
-                                    this.setState({patient: patient});
+                                    let tmp = this.state.referralForm;
+                                    tmp.pasien.noTeleponRumah = text;
+                                    this.setState({ referralForm: tmp });
                                 }}
-                                style={{marginLeft: 4, borderBottomColor: '#c4c4c4', borderBottomWidth: 1}}/>
+                                style={{ marginLeft: 4, borderBottomColor: '#c4c4c4', borderBottomWidth: 1 }} />
                         </View>
                     </View>
                 </View>
 
-                <View style={{width: 100 + '%', height: 370, backgroundColor: '#ffffff', marginTop: 10}}>
-                    <View style={{margin: 5 + '%'}}>
+                <View style={{ width: 100 + '%', height: 300, backgroundColor: '#ffffff', marginTop: 10 }}>
+                    <View style={{ margin: 5 + '%' }}>
                         <View>
-                            <Text style={{color: '#cacaca'}}>
+                            <Text style={{ color: '#cacaca' }}>
                                 Agama
-                                <Text style={{color: '#f05d5e'}}> *</Text>
+                                <Text style={{ color: '#f05d5e' }}> *</Text>
                             </Text>
-                            <View style={{width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1}}>
+                            <View style={{ width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1 }}>
                                 <Picker
-                                    selectedValue={patient.religion}
+                                    selectedValue={this.state.referralForm.pasien.idAgama}
                                     onValueChange={(itemValue) => {
-                                        patient.religion = itemValue
-                                        this.setState({patient: patient});
+                                        let tmp = this.state.referralForm;
+                                        tmp.pasien.idAgama = itemValue;
+                                        this.setState({ referralForm: tmp });
                                     }}
                                 >
-                                    <Picker.Item label={'Islam'} value={1}/>
-                                    <Picker.Item label={'Kristen'} value={2}/>
-                                    <Picker.Item label={'Hindu'} value={3}/>
-                                    <Picker.Item label={'Budha'} value={4}/>
-                                    <Picker.Item label={'Katolik'} value={5}/>
-                                    <Picker.Item label={'Konghucu'} value={6}/>
+                                    {
+                                        this.state.religion.map(type =>
+                                            <Picker.Item label={type.namaAgama} value={type.idAgama} key={type.idAgama} />
+                                        )
+                                    }
                                 </Picker>
                             </View>
                         </View>
-                        <View style={{marginTop: 15}}>
-                            <Text style={{color: '#cacaca'}}>
+                        <View style={{ marginTop: 15 }}>
+                            <Text style={{ color: '#cacaca' }}>
                                 Jenjang Pendidikan
-                                <Text style={{color: '#f05d5e'}}> *</Text>
+                                <Text style={{ color: '#f05d5e' }}> *</Text>
                             </Text>
-                            <View style={{width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1}}>
+                            <View style={{ width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1 }}>
                                 <Picker
-                                    selectedValue={patient.education_level}
+                                    selectedValue={this.state.referralForm.pasien.idJenjangPendidikan}
                                     onValueChange={(itemValue) => {
-                                        patient.education_level = itemValue;
-                                        this.setState({patient: patient})
+                                        let tmp = this.state.referralForm;
+                                        tmp.pasien.idJenjangPendidikan = itemValue;
+                                        this.setState({ referralForm: tmp })
                                     }}
                                 >
-                                    <Picker.Item label={'SD'} value={1}/>
-                                    <Picker.Item label={'SMP'} value={2}/>
-                                    <Picker.Item label={'SMA'} value={3}/>
-                                    <Picker.Item label={'D1/D2/D3'} value={4}/>
-                                    <Picker.Item label={'D4/S1'} value={5}/>
-                                    <Picker.Item label={'S2'} value={6}/>
-                                    <Picker.Item label={'S3'} value={7}/>
+                                    {
+                                        this.state.education.map(type =>
+                                            <Picker.Item label={type.namaJenjangPendidikan} value={type.idJenjangPendidikan} key={type.idJenjangPendidikan} />
+                                        )
+                                    }
                                 </Picker>
                             </View>
                         </View>
-                        <View style={{marginTop: 15}}>
-                            <Text style={{color: '#cacaca'}}>
+                        <View style={{ marginTop: 15 }}>
+                            <Text style={{ color: '#cacaca' }}>
                                 Status Nikah
-                                <Text style={{color: '#f05d5e'}}> *</Text>
+                                <Text style={{ color: '#f05d5e' }}> *</Text>
                             </Text>
-                            <View style={{width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1}}>
+                            <View style={{ width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1 }}>
                                 <Picker
-                                    selectedValue={patient.married_status}
+                                    selectedValue={this.state.referralForm.pasien.idStatusNikah}
                                     onValueChange={(itemValue) => {
-                                        patient.married_status = itemValue;
-                                        this.setState({patient: patient});
+                                        let tmp = this.state.referralForm;
+                                        tmp.pasien.idStatusNikah = itemValue;
+                                        this.setState({ referralForm: tmp });
                                     }}
                                 >
-                                    <Picker.Item label={'Belum Menikah'} value={0}/>
-                                    <Picker.Item label={'Menikah'} value={1}/>
+                                    {
+                                        this.state.marriage.map(type =>
+                                            <Picker.Item label={type.namaStatusNikah} value={type.idStatusNikah} key={type.idStatusNikah} />
+                                        )
+                                    }
+                                    <Picker.Item label={'Belum Menikah'} value={0} />
+                                    <Picker.Item label={'Menikah'} value={1} />
                                 </Picker>
                             </View>
                         </View>
-                        <View style={{marginTop: 15}}>
-                            <Text style={{color: '#cacaca'}}>
+                        {/* <View style={{ marginTop: 15 }}>
+                            <Text style={{ color: '#cacaca' }}>
                                 Negara Asal
-                                <Text style={{color: '#f05d5e'}}> *</Text>
+                                <Text style={{ color: '#f05d5e' }}> *</Text>
                             </Text>
-                            <View style={{width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1}}>
+                            <View style={{ width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1 }}>
                                 <Picker
                                     selectedValue={patient.nationality}
                                     onValueChange={(itemValue) => {
                                         patient.nationality = itemValue;
-                                        this.setState({patient: patient})
+                                        this.setState({ patient: patient })
                                     }}
                                 >
-                                    <Picker.Item label={'Indonesia'} value={1}/>
-                                    <Picker.Item label={'Malaysia'} value={2}/>
+                                    <Picker.Item label={'Indonesia'} value={1} />
+                                    <Picker.Item label={'Malaysia'} value={2} />
                                 </Picker>
                             </View>
-                        </View>
+                        </View> */}
                     </View>
                 </View>
 
-                <View style={{width: 100 + '%', minHeight: 540, backgroundColor: '#ffffff', marginTop: 10}}>
-                    <View style={{margin: 5 + '%'}}>
+                <View style={{ width: 100 + '%', minHeight: 350, backgroundColor: '#ffffff', marginTop: 10 }}>
+                    <View style={{ margin: 5 + '%' }}>
                         <View>
-                            <Text style={{color: '#cacaca'}}>
+                            <Text style={{ color: '#cacaca' }}>
                                 Alamat
-                                <Text style={{color: '#f05d5e'}}> *</Text>
+                                <Text style={{ color: '#f05d5e' }}> *</Text>
                             </Text>
                             <TextInput
                                 ref={(input3) => {
                                     this.input3 = input3
                                 }}
                                 placeholder={'Alamat'}
-                                value={patient.address}
                                 onChangeText={(text) => {
-                                    patient.address = text;
-                                    this.setState({patient: patient});
+                                    let tmp = this.state.referralForm;
+                                    tmp.pasien.alamat = text;
+                                    this.setState({ referralForm: tmp });
                                 }}
                                 style={{
                                     marginLeft: 4,
@@ -492,47 +591,58 @@ class ReferralCreatePatientDataScreen extends Component {
                                     borderBottomWidth: 1
                                 }}
                             />
-                            {!this.state.inputRequired[3] &&
-                            <Text style={{color: '#f05d5e', fontSize: 12, marginLeft: 4}}>Masukkan alamat tempat tinggal
+                            {!this._isError('alamat') &&
+                                <Text style={{ color: '#f05d5e', fontSize: 12, marginLeft: 4 }}>Masukkan alamat tempat tinggal
                                 pasien</Text>}
                         </View>
-                        <View style={{marginTop: 15}}>
-                            <Text style={{color: '#cacaca'}}>
+                        <View style={{ marginTop: 15 }}>
+                            <Text style={{ color: '#cacaca' }}>
                                 Provinsi
-                                <Text style={{color: '#f05d5e'}}> *</Text>
+                                <Text style={{ color: '#f05d5e' }}> *</Text>
                             </Text>
-                            <View style={{width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1}}>
+                            <View style={{ width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1 }}>
                                 <Picker
-                                    selectedValue={patient.province}
+                                    selectedValue={this.state.referralForm.pasien.idProvinsi}
                                     onValueChange={(itemValue) => {
-                                        patient.province = itemValue;
-                                        this.setState({patient: patient});
+                                        let tmp = this.state.referralForm;
+                                        tmp.pasien.idProvinsi = itemValue;
+                                        tmp.pasien.idKota = null;
+                                        this.setState({ referralForm: tmp });
                                     }}
                                 >
-                                    <Picker.Item label={'Indonesia'} value={1}/>
-                                    <Picker.Item label={'Malaysia'} value={2}/>
+                                    {
+                                        this.state.province.map(type =>
+                                            <Picker.Item label={type.namaProvinsi} value={type.idProvinsi} key={type.idProvinsi} />
+                                        )
+                                    }
                                 </Picker>
                             </View>
                         </View>
-                        <View style={{marginTop: 15}}>
-                            <Text style={{color: '#cacaca'}}>
+                        <View style={{ marginTop: 15 }}>
+                            <Text style={{ color: '#cacaca' }}>
                                 Kota / Kabupaten
-                                <Text style={{color: '#f05d5e'}}> *</Text>
+                                <Text style={{ color: '#f05d5e' }}> *</Text>
                             </Text>
-                            <View style={{width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1}}>
+                            <View style={{ width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1 }}>
                                 <Picker
-                                    selectedValue={patient.city}
+                                    selectedValue={this.state.referralForm.pasien.idKota}
                                     onValueChange={(itemValue) => {
-                                        patient.city = itemValue;
-                                        this.setState({patient: patient});
+                                        let tmp = this.state.referralForm;
+                                        tmp.pasien.idKota = itemValue;
+                                        this.setState({ referralForm: tmp });
                                     }}
                                 >
-                                    <Picker.Item label={'Tangerang Selatan'} value={1}/>
-                                    <Picker.Item label={'Tangerang'} value={2}/>
+                                    {
+                                        this.state.city
+                                            .filter(type => type.idKota.substr(0, 2) === this.state.referralForm.pasien.idProvinsi)
+                                            .map(type =>
+                                                <Picker.Item label={type.namaKota} value={type.idKota} key={type.idKota} />
+                                            )
+                                    }
                                 </Picker>
                             </View>
                         </View>
-                        <View style={{marginTop: 15}}>
+                        {/* <View style={{marginTop: 15}}>
                             <Text style={{color: '#cacaca'}}>
                                 Kecamatan
                                 <Text style={{color: '#f05d5e'}}> *</Text>
@@ -567,11 +677,11 @@ class ReferralCreatePatientDataScreen extends Component {
                                     <Picker.Item label={'Rawa Buntu'} value={2}/>
                                 </Picker>
                             </View>
-                        </View>
-                        <View style={{marginTop: 15}}>
-                            <Text style={{color: '#cacaca'}}>
+                        </View> */}
+                        <View style={{ marginTop: 15 }}>
+                            <Text style={{ color: '#cacaca' }}>
                                 Kode Pos
-                                <Text style={{color: '#f05d5e'}}> *</Text>
+                                <Text style={{ color: '#f05d5e' }}> *</Text>
                             </Text>
                             <TextInput
                                 ref={(input4) => {
@@ -579,28 +689,28 @@ class ReferralCreatePatientDataScreen extends Component {
                                 }}
                                 keyboardType={'numeric'}
                                 placeholder={'Kode Pos'}
-                                value={patient.postal_code}
                                 onChangeText={(text) => {
-                                    patient.postal_code = text;
-                                    this.setState({patient: patient});
+                                    let tmp = this.state.referralForm;
+                                    tmp.pasien.kodePos = text;
+                                    this.setState({ referralForm: tmp });
                                 }}
                                 style={{
                                     marginLeft: 4,
-                                    borderBottomColor: (this.state.inputRequired[4] ? '#c4c4c4' : '#f05d5e'),
+                                    borderBottomColor: (this._isError('kodePos') ? '#c4c4c4' : '#f05d5e'),
                                     borderBottomWidth: 1
                                 }}
                             />
-                            {!this.state.inputRequired[4] &&
-                            <Text style={{color: '#f05d5e', fontSize: 12, marginLeft: 4}}>Masukkan kode pos dari alamat
+                            {!this._isError('kodePos') &&
+                                <Text style={{ color: '#f05d5e', fontSize: 12, marginLeft: 4 }}>Masukkan kode pos dari alamat
                                 pasien</Text>}
                         </View>
                     </View>
                 </View>
 
-                <View style={{alignItems: 'center', width: 100 + '%', height: 100}}>
+                <View style={{ alignItems: 'center', width: 100 + '%', height: 100 }}>
                     <TouchableOpacity
                         onPress={() =>
-                            this._submit()
+                            this._submitNewPatient()
                         }
                         style={{
                             justifyContent: 'center',
@@ -611,20 +721,73 @@ class ReferralCreatePatientDataScreen extends Component {
                             backgroundColor: '#28c667',
                             marginTop: 20
                         }}>
-                        <Text style={{color: '#ffffff', fontSize: 12, fontWeight: 'bold'}}>Selanjutnya</Text>
+                        <Text style={{ color: '#ffffff', fontSize: 12, fontWeight: 'bold' }}>Selanjutnya</Text>
                     </TouchableOpacity>
                 </View>
             </View>
         }
     };
 
-    _submit() {
-        let {navigate} = this.props.navigation;
+    _doubleDigit(number) {
+        if (number < 10) {
+            return '0' + number;
+        }
+        return number;
+    }
 
-        let inputRequired = this.state.inputRequired;
-        let inputRequiredData = this.state.inputRequiredData;
-        let inputRequiredDataRead = this.state.inputRequiredDataRead;
-        let patient = this.state.patientSelected;
+    _age(birthDate) {
+        let today = new Date();
+        let year = today.getFullYear() - birthDate.getFullYear();
+        let month = 0;
+        if (today.getMonth() >= birthDate.getMonth()) {
+            month = today.getMonth() - birthDate.getMonth();
+        } else {
+            year--;
+            month = 12 - (birthDate.getMonth() - today.getMonth());
+        }
+        let day = 0;
+        if (today.getDate() >= birthDate.getDate()) {
+            day = today.getDate() - birthDate.getDate();
+        } else {
+            month--;
+            day = 31 - (birthDate.getDate() - today.getDate());
+
+            if (month < 0) {
+                month = 11;
+                year--;
+            }
+        }
+        return year + ' tahun ' + month + ' bulan ' + day + ' hari';
+    }
+
+    _submitNewPatient() {
+        let { navigate } = this.props.navigation;
+
+        let required = {};
+        let inputRequired = [];
+        let inputRequiredData = [];
+        let inputRequiredDataRead = [];
+        if(this.state.referralForm.rujukan.statusBayar > 1) {
+            inputRequired.push(true);
+            inputRequiredDataRead.push('Nomor BPJS/Asuransi')
+            if(this.state.referralForm.rujukan.statusBayar <= 2) {
+                required['noBpjs'] = true;
+                delete required['noAsuransiLain'];
+                inputRequiredData.push('noBpjs');
+            } else {
+                required['noAsuransiLain'] = true;
+                delete required['noBpjs'];
+                inputRequiredData.push('noAsuransiLain');
+            }
+        }
+
+        if(!this.state.isFound) {
+            inputRequired = inputRequired.concat(this.state.inputRequired);
+            inputRequiredData = inputRequiredData.concat(this.state.inputRequiredData);
+            inputRequiredDataRead = inputRequiredDataRead.concat(this.state.inputRequiredDataRead);
+        }
+
+        let patient = this.state.referralForm.pasien;
         let result = true;
 
         let error = [];
@@ -637,21 +800,22 @@ class ReferralCreatePatientDataScreen extends Component {
                 result = false;
                 errorCount = errorCount + 1;
 
-                if (errorCount < 5) {
+                if (errorCount <= 5) {
                     error.push(inputRequiredDataRead[index])
                 }
             }
 
+            required[inputRequiredData[index]] = tmp;
             inputRequired[index] = tmp;
-        });
-
-        this.setState({inputRequired: inputRequired});
+        });        
 
         if (result) {
             navigate('ReferralCreateScheduleDestinationScreen', {
-                    referralType: this.state.referralType,
-                    insurancePatientType: this.state.insurancePatientType
-                }
+                referralType: this.state.referralType,
+                city: this.state.city,
+                referralForm: this.state.referralForm,
+                insurancePatientType: this.state.insurancePatientType
+            }
             );
         } else {
             let message = 'Pastikan seluruh kolom yang bertanda bintang (*) sudah terisi.';
@@ -660,9 +824,80 @@ class ReferralCreatePatientDataScreen extends Component {
                 message = error.join(', ') + ' belum terisi.';
             }
 
+            this.setState({required: required}, () => {});
+
             Alert.alert('Validasi Gagal', message)
         }
     };
+
+    _isError(key) {
+
+        let required = this.state.required;
+
+        if(key in required) {
+            return required[key];
+        } else {
+            return true;
+        }
+
+    }
+
+    // _submitNewPatient() {
+    //     let { navigate } = this.props.navigation;
+
+    //     let inputRequired = [];
+    //     let inputRequiredData = [];
+    //     let inputRequiredDataRead = [];
+    //     if(this.state.referralForm.rujukan.statusBayar > 1) {
+    //         inputRequired.push(true);
+    //         inputRequiredDataRead.push('Nomor BPJS/Asuransi')
+    //         if(this.state.referralForm.rujukan.statusBayar <= 2) {
+    //             inputRequiredData.push('noBpjs');
+    //         } else {
+    //             inputRequiredData.push('noAsuransiLain');
+    //         }
+    //     }
+    //     let patient = this.state.referralForm.pasien;
+    //     let result = true;
+
+    //     let error = [];
+    //     let errorCount = 0;
+
+    //     inputRequired.map(function (input, index) {
+    //         let tmp = true;
+    //         if (!patient[inputRequiredData[index]]) {
+    //             tmp = false;
+    //             result = false;
+    //             errorCount = errorCount + 1;
+
+    //             if (errorCount < 5) {
+    //                 error.push(inputRequiredDataRead[index])
+    //             }
+    //         }
+
+    //         inputRequired[index] = tmp;
+    //     });
+
+    //     this.setState({ inputRequired: inputRequired });
+
+    //     if (result) {
+    //         navigate('ReferralCreateScheduleDestinationScreen', {
+    //             referralType: this.state.referralType,
+    //             referralForm: this.state.referralForm,
+    //             city: this.state.city,
+    //             insurancePatientType: this.state.insurancePatientType
+    //         }
+    //         );
+    //     } else {
+    //         let message = 'Pastikan seluruh kolom yang bertanda bintang (*) sudah terisi.';
+
+    //         if (errorCount <= 5) {
+    //             message = error.join(', ') + ' belum terisi.';
+    //         }
+
+    //         Alert.alert('Validasi Gagal', message)
+    //     }
+    // };
 
     render() {
 
@@ -672,7 +907,7 @@ class ReferralCreatePatientDataScreen extends Component {
                     animation={'slide'}
                     visible={this.state.spinner}
                     textContent={'Mencari Data Pasien...'}
-                    textStyle={{color: '#ffffff'}}
+                    textStyle={{ color: '#ffffff' }}
                 />
                 <View style={{
                     flexDirection: 'row',
@@ -688,59 +923,130 @@ class ReferralCreatePatientDataScreen extends Component {
                     {this._setFormWizardScreen(false, 5, 'ICD-10', true)}
                 </View>
                 <ScrollView>
-                    <View style={{width: 100 + '%', minHeight: 210, backgroundColor: '#ffffff'}}>
-                        <View style={{margin: 5 + '%'}}>
-                            <View>
-                                <Text style={{color: '#cacaca'}}>
-                                    Nomor Identitas (KTP / SIM / Paspor)
-                                    <Text style={{color: '#f05d5e'}}> *</Text>
-                                </Text>
-                                <TextInput
-                                    returnKeyType={'search'}
-                                    keyboardType={'numeric'}
-                                    onChangeText={(text) => this.setState({identityNumberChanged: text})}
-                                    onSubmitEditing={() => this._searchPatient()}
-                                    placeholder={'Nomor Identitas (KTP / SIM / Paspor)'}
-                                    style={{marginLeft: 4, borderBottomColor: '#c4c4c4', borderBottomWidth: 1}}/>
+                    <View style={{ width: 100 + '%', minHeight: 210, backgroundColor: '#ffffff' }}>
+                        <View style={{ marginHorizontal: 5 + '%', marginBottom: 5 + '%' }}>
+                            <Text style={{ color: '#cacaca' }}>
+                                Jenis Identitas
+                                <Text style={{ color: '#f05d5e' }}> *</Text>
+                            </Text>
+                            <View style={{ width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1 }}>
+                                <Picker
+                                    selectedValue={this.state.referralForm.pasien.idJenisIdentitas}
+                                    onValueChange={(itemValue) => {
+                                        let tmp = this.state.referralForm;
+                                        tmp.pasien.idJenisIdentitas = itemValue;
+                                        this.setState({ referralForm: tmp });
+                                    }}
+                                >
+                                    {
+                                        this.state.identityType.map(type =>
+                                            <Picker.Item label={type.namaJenisIdentitas} value={type.idJenisIdentitas} key={type.idJenisIdentitas} />
+                                        )
+                                    }
+                                </Picker>
                             </View>
-                            <View style={{marginTop: 15}}>
-                                <Text style={{color: '#cacaca'}}>
+                            <View style={{ marginTop: 15 }}>
+                                <View>
+                                    <Text style={{ color: '#cacaca' }}>
+                                        Nomor Identitas (KTP / SIM / Paspor)
+                                    <Text style={{ color: '#f05d5e' }}> *</Text>
+                                    </Text>
+                                    <TextInput
+                                        returnKeyType={'search'}
+                                        keyboardType={'numeric'}
+                                        onChangeText={(text) => this.setState({ identityNumberChanged: text })}
+                                        onSubmitEditing={() => this._searchPatient()}
+                                        placeholder={'Nomor Identitas (KTP / SIM / Paspor)'}
+                                        style={{ marginLeft: 4, borderBottomColor: '#c4c4c4', borderBottomWidth: 1 }} />
+                                </View>
+                            </View>
+                            <View style={{ marginTop: 15 }}>
+                                <Text style={{ color: '#cacaca' }}>
                                     Jenis Asuransi Pasien
-                                    <Text style={{color: '#f05d5e'}}> *</Text>
+                                    <Text style={{ color: '#f05d5e' }}> *</Text>
                                 </Text>
-                                <View style={{width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1}}>
+                                <View style={{ width: 100 + '%', borderBottomColor: '#c4c4c4', borderBottomWidth: 1 }}>
                                     <Picker
-                                        selectedValue={this.state.insurancePatientType}
-                                        onValueChange={(itemValue, itemIndex) => this.setState({insurancePatientType: itemValue})}
+                                        selectedValue={this.state.referralForm.rujukan.statusBayar}
+                                        onValueChange={(itemValue) => {
+                                            let tmp = this.state.referralForm;
+                                            tmp.rujukan.statusBayar = itemValue;
+                                            this.setState({ referralForm: tmp })
+                                        }
+                                        }
                                     >
-                                        <Picker.Item label={'BPJS'} value={1}/>
-                                        <Picker.Item label={'Non BPJS (Asuransi Lain)'} value={2}/>
-                                        <Picker.Item label={'Umum (Bayar Sendiri)'} value={3}/>
+                                        {
+                                            this.state.insuranceType.map(type =>
+                                                <Picker.Item label={type.namaJenisPasien} value={type.idJenisPasien} key={type.idJenisPasien} />
+                                            )
+                                        }
                                     </Picker>
                                 </View>
                             </View>
-                            <View style={{marginTop: 15}}>
-                                <Text style={{color: '#cacaca', textAlign: 'center'}}>Jika terdapat di dalam sistem,
+                            {
+                                 ((this.state.isSearched || this.state.isSelected) && this.state.referralForm.rujukan.statusBayar > 1)
+                                    ?
+                                    <View style={{ marginTop: 15 }}>
+                                        <Text style={{ color: '#cacaca' }}>
+                                            {this.state.referralForm.rujukan.statusBayar <= 2 ? 'Nomor BPJS' : 'Nomor Asuransi Lain'}
+                                            <Text style={{ color: '#f05d5e' }}> *</Text>
+                                        </Text>
+                                        <TextInput
+                                            ref={(input0) => {
+                                                this.input0 = input0
+                                            }}
+                                            placeholder={this.state.referralForm.rujukan.statusBayar <= 2 ? 'Nomor BPJS' : 'Nomor Asuransi Lain'}
+                                            value={
+                                                this.state.referralForm.rujukan.statusBayar <=2 ? 
+                                                this.state.referralForm.pasien.noBpjs : this.state.referralForm.pasien.noAsuransiLain
+                                            }
+                                            onChangeText={(text) => {
+                                                let tmp = this.state.referralForm;
+                                                if (tmp.rujukan.statusBayar <= 2) {
+                                                    tmp.pasien.noBpjs = text;
+                                                } else {
+                                                    tmp.pasien.noAsuransiLain = text;
+                                                }
+                                                this.setState({ referralForm: tmp });
+                                            }}
+                                            style={{
+                                                marginLeft: 4,
+                                                borderBottomColor: 
+                                                    (this._isError('noBpjs') && this._isError('noAsuransiLain')) ? 
+                                                    '#c4c4c4' : '#f05d5e',
+                                                borderBottomWidth: 1
+                                            }}
+                                        />
+                                        {
+                                            !(this._isError('noBpjs') && this._isError('noAsuransiLain')) &&
+                                            <Text style={{ color: '#f05d5e', fontSize: 12, marginLeft: 4 }}>Masukkan nomor bpjs/asuransi
+                                        pasien</Text>}
+                                    </View>
+                                    :
+                                    null
+                            }
+                             <View style={{ marginTop: 15 }}>
+                                    <Text style={{ color: '#cacaca', textAlign: 'center' }}>Jika terdapat di dalam sistem,
                                     data pasien akan terisi secara otomatis.</Text>
-                            </View>
-                            <View style={{alignItems: 'center', width: 100 + '%', height: 55}}>
-                                <TouchableOpacity
-                                    onPress={() =>
-                                        this._searchPatient()
-                                    }
-                                    style={{
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        width: 80 + '%',
-                                        height: 35,
-                                        borderRadius: 5,
-                                        backgroundColor: '#00a6fb',
-                                        marginTop: 20
-                                    }}>
-                                    <Text style={{color: '#ffffff', fontSize: 12, fontWeight: 'bold'}}>Cari
+                                </View>
+                                <View style={{ alignItems: 'center', width: 100 + '%', height: 55 }}>
+                                    <TouchableOpacity
+                                        onPress={() =>
+                                            this._searchPatient()
+                                        }
+                                        style={{
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            width: 80 + '%',
+                                            height: 35,
+                                            borderRadius: 5,
+                                            backgroundColor: '#00a6fb',
+                                            marginTop: 20
+                                        }}>
+                                        <Text style={{ color: '#ffffff', fontSize: 12, fontWeight: 'bold' }}>Cari
                                         Pasien</Text>
-                                </TouchableOpacity>
-                            </View>
+                                    </TouchableOpacity>
+                                </View>
                         </View>
                     </View>
 

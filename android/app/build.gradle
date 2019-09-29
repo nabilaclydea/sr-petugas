@@ -105,8 +105,8 @@ android {
         applicationId "com.sirujuk"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 9
-        versionName "0.09"
+        versionCode 15
+        versionName "0.15"
     }
 
     signingConfigs {
@@ -148,9 +148,19 @@ android {
             }
         }
     }
+
+    dexOptions {
+        jumboMode = true
+    }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
+    implementation project(':react-native-pdf-lib')
+    implementation project(':rn-fetch-blob')
     implementation project(':@react-native-community_async-storage')
     implementation project(':react-native-document-picker')
     implementation project(':react-native-vector-icons')

@@ -3,6 +3,8 @@ package com.sirujuk;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.hopding.pdflib.PDFLibPackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
 import com.reactnativecommunity.asyncstorage.AsyncStoragePackage;
 import com.reactnativedocumentpicker.ReactNativeDocumentPicker;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -27,6 +29,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new PDFLibPackage(),
+            new RNFetchBlobPackage(),
             new AsyncStoragePackage(),
             new ReactNativeDocumentPicker(),
             new VectorIconsPackage(),

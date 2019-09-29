@@ -12,28 +12,40 @@ class LoginScreen extends Component {
             username: '',
             password: '',
             spinner: false,
+            error: false,
+            errorMessage: '',
         };
     }
 
     _login() {
-
-        this.setState({spinner: true});
-        HealthcareAPI
-            .post(
-                '/login',
-                {
-                    username: this.state.username,
-                    password: this.state.password,
-                    role: 3
-                }
-            )
-            .then(response => {
-                this.setState({spinner: false});
-                if(response.data.status === "200") {
-                    AsyncStorage.setItem('user', JSON.stringify(response.data));
-                    this.props.navigation.navigate('Auth');
-                }
-            });
+        if(this.state.username.replace(/\s/g, '') === '') {
+            this.setState({error: true, errorMessage: 'Masukkan username'})
+        } else {
+            if(this.state.password === '') {
+                this.setState({error: true, errorMessage: 'Masukkan password'})
+            } else {
+                this.setState({spinner: true});
+                HealthcareAPI
+                    .post(
+                        '/login',
+                        {
+                            username: this.state.username,
+                            password: this.state.password,
+                            role: 3
+                        }
+                    )
+                    .then(response => {
+                        this.setState({spinner: false});
+                        if(response.data.status === "200") {
+                            AsyncStorage.setItem('user', JSON.stringify(response.data));
+                            this.props.navigation.navigate('Auth');
+                        } else {
+                            this.setState({error: true, spinner: false, errorMessage: 'Username / Password yang anda masukkan salah'})
+                        }
+                    })
+                    .catch(error => this.setState({error: true, spinner: false, errorMessage: 'Username / Password yang anda masukkan salah'}));
+            }
+        }
     }
 
     render() {
@@ -53,21 +65,23 @@ class LoginScreen extends Component {
                     value={this.state.username}
                     onChangeText={(username) => this.setState({ username })}
                     placeholder={'Username'}
-                    style={styles.input}
+                    style={this.state.error ? styles.inputInValid : styles.inputValid}
                 />
                 <TextInput
                     value={this.state.password}
                     onChangeText={(password) => this.setState({ password })}
                     placeholder={'Password'}
                     secureTextEntry={true}
-                    style={styles.input}
+                    style={this.state.error ? styles.inputInValid : styles.inputValid}
                 />
+                {this.state.error ? 
+                <Text style={{fontWeight: 'bold', fontSize: 14, color: '#f05d5e', marginBottom: 20}}>{this.state.errorMessage}</Text> : null}
 
                 <TouchableOpacity style={[styles.buttonContainer, styles.loginButton]} onPress={() => this._login()}>
                     <Text style={{color: '#ffffff', fontWeight: 'bold'}}>Login</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.buttonContainer} onPress={() => this.onClickListener('restore_password')}>
+                <TouchableOpacity style={styles.buttonContainer}>
                     <Text>Forgot your password?</Text>
                 </TouchableOpacity>
 
@@ -89,7 +103,7 @@ const styles = StyleSheet.create({
         marginBottom: 30,
         textAlign: 'center',
     },
-    input: {
+    inputValid: {
         borderBottomWidth: 1,
         width: 80 + '%',
         height:45,
@@ -98,6 +112,17 @@ const styles = StyleSheet.create({
         alignItems:'center',
         marginLeft: 4,
         borderBottomColor: '#c4c4c4',
+        color: '#cacaca'
+    },
+    inputInValid: {
+        borderBottomWidth: 1,
+        width: 80 + '%',
+        height:45,
+        marginBottom:20,
+        flexDirection: 'row',
+        alignItems:'center',
+        marginLeft: 4,
+        borderBottomColor: '#f05d5e',
         color: '#cacaca'
     },
     buttonContainer: {

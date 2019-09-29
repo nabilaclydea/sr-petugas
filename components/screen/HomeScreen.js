@@ -4,12 +4,9 @@ import HealthcareAPI from "../api/HealthcareAPI";
 import AsyncStorage from "@react-native-community/async-storage";
 import Spinner from 'react-native-loading-spinner-overlay';
 
-let name = 'Budi Sudrajat';
-
 class HomeScreen extends Component {
 
-    static navigationOptions = {
-
+    static navigationOptions = ({navigation}) => ({
         header: (
             <View style={{alignItems: 'center', flexDirection: 'row', height: 45}}>
                 <View style={{flexDirection: 'row', alignItems: 'center', paddingLeft: 3 + '%'}}>
@@ -21,11 +18,11 @@ class HomeScreen extends Component {
                     </View>
                 </View>
                 <View style={{position: 'absolute', right: 3 + '%', alignItems: 'center'}}>
-                    <Text style={{fontWeight: 'bold'}}>{name}</Text>
+                    <Text style={{fontWeight: 'bold'}}>{navigation.state.params.nama.split(' ').slice(0,2).join(' ')}</Text>
                 </View>
             </View>
         ),
-    };
+    });
 
     state = {
         user: {},

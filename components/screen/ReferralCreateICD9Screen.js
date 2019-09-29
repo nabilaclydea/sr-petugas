@@ -1,5 +1,6 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
+    FlatList,
     View,
     ScrollView,
     TouchableOpacity,
@@ -9,30 +10,12 @@ import {
     StyleSheet,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import HealthcareAPI from '../api/HealthcareAPI';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 class ReferralCreateICD9Screen extends Component {
 
-    state = {
-        isDateTimePickerVisible: false,
-        referralType: this.props.navigation.getParam('referralType'),
-        insurancePatientType: this.props.navigation.getParam('insurancePatientType'),
-        selectedItems: [],
-        items: [{id: '1', name: 'Rontgen'}, {id: '2', name: 'MRI'}],
-        icd9: [
-            {code: '00.01', name: 'Terapi ultrasound kapal kepala dan leher'},
-            {code: '00.02', name: 'Terapi USG hati'},
-            {code: '00.03', name: 'Terapi USG kapal pembuluh darah perifer'},
-            {code: '00.09', name: 'USG terapeutik lainnya'},
-            {code: '00.10', name: 'Implantasi agen kemoterapi'},
-            {code: '00.11', name: 'Infusion dari alfa drotrecogin (diaktifkan)'},
-            {code: '00.12', name: 'Administrasi oksida nitrat dihirup'},
-            {code: '00.13', name: 'Injeksi atau infus nesiritide'},
-            {code: '00.14', name: 'Injeksi atau infus kelas oksazolidinon antibiotik'},
-        ],
-        selectedICD9: [],
-    };
-
-    static navigationOptions = ({navigation}) => {
+    static navigationOptions = ({ navigation }) => {
         return {
             headerStyle: {
                 color: '#ffffff',
@@ -40,7 +23,7 @@ class ReferralCreateICD9Screen extends Component {
             headerTintColor: '#000000',
             headerTitle:
                 <View>
-                    <Text style={{fontSize: 18, fontWeight: 'bold', color: '#000000'}}>
+                    <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#000000' }}>
                         {navigation.getParam('referralType') <= 1 ? 'Rujuk Poli' : 'Rujuk Emergency'}
                     </Text>
                 </View>
@@ -48,9 +31,31 @@ class ReferralCreateICD9Screen extends Component {
         };
     };
 
+    state = {
+        isDateTimePickerVisible: false,
+        referralType: this.props.navigation.getParam('referralType'),
+        insurancePatientType: this.props.navigation.getParam('insurancePatientType'),
+        selectedItems: [],
+        items: [{ id: '1', name: 'Rontgen' }, { id: '2', name: 'MRI' }],
+        spinner: false,
+        icd9: [],
+        selectedICD9: [],
+    };
+
+    componentWillMount() {
+        this._icd9();
+    }
+
+    _icd9() {
+        this.setState({ spinner: true });
+        HealthcareAPI
+            .get('/diagnosis/icd/list', { params: { type: 9 } })
+            .then(response => this.setState({ icd9: response.data, spinner: false }))
+    }
+
     _setFormWizardScreen(isActive, index, text, isLast) {
         return <View
-            style={{flexDirection: 'row', alignItems: 'center', marginLeft: 10, marginRight: (isLast ? 10 : 0)}}>
+            style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 10, marginRight: (isLast ? 10 : 0) }}>
             <View style={{
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -59,7 +64,7 @@ class ReferralCreateICD9Screen extends Component {
                 height: 15,
                 borderRadius: 100
             }}>
-                <Text style={{color: '#ffffff', fontSize: 8}}>
+                <Text style={{ color: '#ffffff', fontSize: 8 }}>
                     {index}
                 </Text>
             </View>
@@ -70,78 +75,64 @@ class ReferralCreateICD9Screen extends Component {
                 marginLeft: 5
             }}>{text}</Text>
             {isLast ? null : <View
-                style={{backgroundColor: (isActive ? '#00818c' : '#c4c4c4'), width: 20, height: 2, marginLeft: 5}}/>}
+                style={{ backgroundColor: (isActive ? '#00818c' : '#c4c4c4'), width: 20, height: 2, marginLeft: 5 }} />}
         </View>
     };
 
-    _updateSelectedICD9(code, isSelected) {
+    _updateSelectedICD9(icd9) {
         let current = this.state.selectedICD9;
 
-        if (isSelected) {
-            current = current.filter(icd9 => icd9 !== code)
+        if (current.filter(item => item.idDiagnosis === icd9.idDiagnosis).length > 0) {
+            current = current.filter(item => item.idDiagnosis !== icd9.idDiagnosis)
         } else {
-            current.push(code);
+            current.push(icd9);
         }
 
-        this.setState({selectedICD9: current});
+        this.setState({ selectedICD9: current });
     };
 
-    _setICD9Screen() {
-        return this.state.icd9.map(icd => {
-            let code = icd.code;
-            let isSelected = this.state.selectedICD9.includes(code);
-
-            return <TouchableOpacity
-                key={code}
-                onPress={() => this._updateSelectedICD9(code, isSelected)}
-                style={{
-                    width: 100 + '%',
-                    height: 80,
-                    backgroundColor: (isSelected ? '#f8f8f8' : '#ffffff'),
-                    borderBottomColor: '#f8f8f8',
-                    borderBottomWidth: 1
-                }}>
-                <View style={{
-                    flexDirection: 'row',
-                    height: 100 + '%',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    marginHorizontal: 5 + '%'
-                }}>
-                    <View style={{width: 20 + '%', justifyContent: 'center'}}>
-                        <Text>{code}</Text>
-                    </View>
-                    <View style={{width: 70 + '%', justifyContent: 'center'}}>
-                        <Text>{icd.name}</Text>
-                    </View>
-                    <View style={{width: 10 + '%', justifyContent: 'center'}}>
-                        <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
-                            <View style={{
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                width: 20,
-                                height: 20,
-                                backgroundColor: (isSelected ? '#00818c' : '#ffffff'),
-                                borderColor: (isSelected ? '#00818c' : '#cacaca'),
-                                borderRadius: 3,
-                                borderWidth: 2
-                            }}>
-                                {isSelected ?
-                                    <Image style={{width: 10, height: 10}}
-                                           source={require('../../assets/images/tick.png')}/> : null}
-                            </View>
-                        </View>
-                    </View>
+    _renderICD9(item) {
+        let isSelected = (this.state.selectedICD9.filter(icd9 => icd9.idDiagnosis === item.idDiagnosis).length > 0);
+        return <TouchableOpacity
+            onPress={() => this._updateSelectedICD9(item)}
+            style={{
+                width: 100 + '%',
+                height: 80,
+                backgroundColor: '#ffffff',
+                backgroundColor: (isSelected ? '#f8f8f8' : '#ffffff'),
+                borderBottomColor: '#f8f8f8',
+                borderBottomWidth: 1
+            }}>
+            <View style={{
+                flexDirection: 'row',
+                height: 100 + '%',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginHorizontal: 5 + '%'
+            }}>
+                <View style={{ width: 20 + '%', justifyContent: 'center' }}>
+                    <Text>{item.kodeDiagnosis}</Text>
                 </View>
-            </TouchableOpacity>
-        });
+                <View style={{ width: 80 + '%', justifyContent: 'center' }}>
+                    <Text>{item.namaDiagnosis}</Text>
+                </View>
+            </View>
+        </TouchableOpacity>
+    }
+
+    _setICD9Screen() {
+        return <FlatList
+            data={this.state.icd9}
+            renderItem={({ item }) => this._renderICD9(item)}
+            keyExtractor={(item) => item.idDiagnosis}
+        />
     };
 
     _setSelectedICD9Screen() {
         return this.state.selectedICD9.map(icd9 => {
-            return <TouchableOpacity onPress={() => this._updateSelectedICD9(icd9, true)} key={icd9}
-                                     style={{justifyContent: 'center', width: 100, height: 70}}>
-                <View style={{justifyContent: 'flex-end', width: 75, height: 35}}>
+            return <TouchableOpacity onPress={() => this._updateSelectedICD9(icd9)} key={icd9.idDiagnosis}
+                style={{ justifyContent: 'center', width: 100, height: 70 }}>
+                <View style={{ justifyContent: 'flex-end', width: 75, height: 35 }}>
                     <View style={{
                         justifyContent: 'center',
                         alignItems: 'center',
@@ -154,7 +145,7 @@ class ReferralCreateICD9Screen extends Component {
                             color: '#000000',
                             fontSize: 10,
                             fontWeight: 'bold'
-                        }}>{icd9}</Text>
+                        }}>{icd9.kodeDiagnosis}</Text>
                     </View>
                     <View style={{
                         position: 'absolute',
@@ -177,11 +168,16 @@ class ReferralCreateICD9Screen extends Component {
     };
 
     render() {
-        const {navigate} = this.props.navigation;
+        const { navigate } = this.props.navigation;
 
         return (
             <View style={styles.firstLayer}>
-
+                <Spinner
+                    animation={'slide'}
+                    visible={this.state.spinner}
+                    textContent={'Mengambil Data ICD 9'}
+                    textStyle={{ color: '#ffffff' }}
+                />
                 <View style={{
                     flexDirection: 'row',
                     justifyContent: 'flex-end',
@@ -197,35 +193,40 @@ class ReferralCreateICD9Screen extends Component {
                     {this._setFormWizardScreen(false, 5, 'ICD-10', true)}
                 </View>
 
-                <View style={{width: 100 + '%', height: 50, backgroundColor: '#ffffff'}}>
-                    <View style={{flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 + '%'}}>
-                        <Image style={{width: 15, height: 15, marginRight: 25}}
-                               source={require('../../assets/images/magnifier.png')}/>
+                <View style={{ width: 100 + '%', height: 50, backgroundColor: '#ffffff' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 + '%' }}>
+                        <Image style={{ width: 15, height: 15, marginRight: 25 }}
+                            source={require('../../assets/images/magnifier.png')} />
                         <TextInput placeholder={'Cari ICD-9 CM'}
-                                   style={{color: '#cacaca', fontSize: 10, width: 90 + '%'}}/>
+                            style={{ color: '#cacaca', fontSize: 10, width: 90 + '%' }} />
                     </View>
                 </View>
 
                 <ScrollView>
-                    <ScrollView style={{height: 320}} nestedScrollEnabled={true}>
+                    <ScrollView style={{ height: 320 }} nestedScrollEnabled={true}>
                         {this._setICD9Screen()}
                     </ScrollView>
 
-                    <View style={{width: 100 + '%', height: 70, backgroundColor: '#ebebeb'}}>
-                        <View style={{marginHorizontal: 5 + '%'}}>
+                    <View style={{ width: 100 + '%', height: 70, backgroundColor: '#ebebeb' }}>
+                        <View style={{ marginHorizontal: 5 + '%' }}>
                             <ScrollView horizontal={true} nestedScrollEnabled={true}>
                                 {this._setSelectedICD9Screen()}
                             </ScrollView>
                         </View>
                     </View>
 
-                    <View style={{alignItems: 'center', width: 100 + '%', minHeight: 55}}>
+                    <View style={{ alignItems: 'center', width: 100 + '%', minHeight: 55 }}>
                         <TouchableOpacity
                             onPress={() =>
                                 navigate('ReferralCreateICD10Screen', {
-                                        referralType: this.state.referralType,
-                                        insurancePatientType: this.state.insurancePatientType
-                                    }
+                                    user: this.props.navigation.getParam('user'),
+                                    referralForm: this.props.navigation.getParam('referralForm'),
+                                    docPemeriksaanDarah: this.props.navigation.getParam('docPemeriksaanDarah'),
+                                    docPemeriksaanLain: this.props.navigation.getParam('docPemeriksaanLain'),
+                                    icd9: this.state.selectedICD9,
+                                    referralType: this.state.referralType,
+                                    insurancePatientType: this.state.insurancePatientType
+                                }
                                 )}
                             style={{
                                 justifyContent: 'center',
@@ -236,7 +237,7 @@ class ReferralCreateICD9Screen extends Component {
                                 backgroundColor: '#28c667',
                                 marginTop: 20
                             }}>
-                            <Text style={{color: '#ffffff', fontSize: 12, fontWeight: 'bold'}}>Selanjutnya</Text>
+                            <Text style={{ color: '#ffffff', fontSize: 12, fontWeight: 'bold' }}>Selanjutnya</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
