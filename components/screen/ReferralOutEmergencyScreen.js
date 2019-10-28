@@ -26,6 +26,7 @@ class ReferralOutEmergencyScreen extends Component {
         activeStatus: 1,
         isActiveStatusOptionOpen: 0,
         referrals: [],
+        search: '',
     };
 
     _setStatusReferralScreen() {
@@ -52,7 +53,18 @@ class ReferralOutEmergencyScreen extends Component {
         const {navigate} = this.props.navigation;
 
         let result = this.state.referrals.filter(referral =>
-            this.state.textStatus[this.state.activeStatus - 1] == referral.statusRujukan.namaStatusRujukan)
+            {
+                let isStatus = this.state.textStatus[this.state.activeStatus - 1] == referral.statusRujukan.namaStatusRujukan;
+                let search = this.state.search.toLowerCase();
+                if(isStatus && referral.noRujukan.toLowerCase().includes(search)) {
+                    return true;
+                } else if(isStatus && referral.pasien.nama.toLowerCase().includes(search)) {
+                    return true;
+                } else if(isStatus && referral.faskesTujuan.nama.toLowerCase().includes(search)) {
+                    return true
+                }
+                return false;
+            })
             .map(referral =>
                 <View key={referral.noRujukan}>
                     <TouchableOpacity
@@ -221,7 +233,7 @@ class ReferralOutEmergencyScreen extends Component {
                 }}>
                     <Image style={{marginLeft: 5 + '%', width: 20, height: 20}}
                            source={require('../../assets/images/magnifier.png')}/>
-                    <TextInput placeholder={'Cari Pasien atau Faskes'} placeholderTextColor={'#aeaeae'}
+                    <TextInput onChangeText={(search) => this.setState({search})} placeholder={'Cari Pasien atau Faskes'} placeholderTextColor={'#aeaeae'}
                                style={{marginLeft: 5 + '%', width: 45 + '%'}}/>
                     <View style={{backgroundColor: '#aeaeae', width: 1, height: 60 + '%'}}/>
                     <TouchableOpacity style={{flexDirection: 'row', width: 100 + '%'}}

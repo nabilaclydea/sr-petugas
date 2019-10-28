@@ -90,7 +90,7 @@ class ProfileScreen extends Component {
                         <View style={{alignItems: 'center'}}>
                             <View style={{width: 80 + '%', justifyContent: 'center', height: 130, marginTop: 10}}>
                                 <View style={{alignItems: 'center', height: 100}}>
-                                    <Image style={{borderRadius: 100, width: 100, height: 100}} source={require('../../assets/images/profil.jpg')} />
+                                    <Image style={{borderRadius: 100, width: 100, height: 100}} source={require('../../assets/images/user.png')} />
                                     <View style={{position: 'absolute', flexDirection: 'row', alignItems: 'center', right: 0}}>
                                         <Text style={{color: '#00818c', marginRight: 5 + '%'}}>ubah profil</Text>
                                         <Image style={{width: 10, height: 10}} source={require('../../assets/images/edit.png')} />
@@ -132,6 +132,13 @@ class ProfileScreen extends Component {
                     <View style={{backgroundColor: '#fafafa', width: 100 + '%', height: 1}}></View>
                     <TouchableOpacity activeOpacity={0.8} style={{backgroundColor: '#ffffff', justifyContent: 'center', width: 100 + '%', height: 50}}>
                         <Text style={{marginLeft: 5 + '%'}}>Kebijakan Privasi</Text>
+                        <View style={{position: 'absolute', right: 5 + '%'}}>
+                            <Image style={{width: 13, height: 13}} source={require('../../assets/images/right-arrow.png')} />
+                        </View>
+                    </TouchableOpacity>
+                    <View style={{backgroundColor: '#fafafa', width: 100 + '%', height: 1}}></View>
+                    <TouchableOpacity onPress={() => navigate('ResetPasswordScreen', {username: this.state.user.username, source: 1})} activeOpacity={0.8} style={{backgroundColor: '#ffffff', justifyContent: 'center', width: 100 + '%', height: 50}}>
+                        <Text style={{marginLeft: 5 + '%'}}>Ubah Password</Text>
                         <View style={{position: 'absolute', right: 5 + '%'}}>
                             <Image style={{width: 13, height: 13}} source={require('../../assets/images/right-arrow.png')} />
                         </View>

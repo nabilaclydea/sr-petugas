@@ -98,7 +98,7 @@ class ProfileEditScreen extends Component {
                 />
                 <StatusBar backgroundColor={'#00818c'}/>
                 <ScrollView>
-                    <View style={{backgroundColor: '#ffffff', width: 100 + '%', height: 130}}>
+                    {/* <View style={{backgroundColor: '#ffffff', width: 100 + '%', height: 130}}>
                         <TouchableOpacity>
                             <View style={{flexDirection: 'row', justifyContent: 'center', alignItems: 'center', height: 100 + '%'}}>
                                 <View style={{width: 100, height: 100}}>
@@ -111,7 +111,7 @@ class ProfileEditScreen extends Component {
                                 </View>
                             </View>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
                     <View style={{backgroundColor: '#ffffff', width: 100 + '%', height: 280}}>
                         <View style={{marginHorizontal: 5 + '%', marginTop: 5 + '%'}}>
                             <View>

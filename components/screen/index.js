@@ -1,5 +1,8 @@
 import HomeScreen from './HomeScreen';
 import LoginScreen from './LoginScreen';
+import ForgetPasswordScreen from './ForgetPasswordScreen';
+import CodePasswordScreen from './CodePasswordScreen';
+import ResetPasswordScreen from './ResetPasswordScreen';
 import AuthScreen from './AuthScreen';
 
 import ReferralCreatePatientDataScreen from './ReferralCreatePatientDataScreen';
@@ -23,6 +26,9 @@ import ProfileEditScreen from './ProfileEditScreen';
 export {
     AuthScreen,
     LoginScreen,
+    ForgetPasswordScreen,
+    CodePasswordScreen,
+    ResetPasswordScreen,
     HomeScreen,
 
     ReferralCreatePatientDataScreen,

@@ -722,7 +722,7 @@ class ReferralCreateReferralDataScreen extends Component {
                     <View style={{width: 100 + '%', minHeight: 230, backgroundColor: '#ffffff', marginTop: 10}}>
                         <View style={{margin: 5 + '%'}}>
                             <View style={{marginTop: 15}}>
-                                <Text style={{color: '#cacaca'}}>Dokumen Hasil Pemeriksaan Darah</Text>
+                                <Text style={{color: '#cacaca'}}>Dokumen Hasil Pemeriksaan Darah (dalam format PDF)</Text>
                                 <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                                     <TextInput value={
                                         this.state.docPemeriksaanDarah == null ? 
@@ -751,7 +751,7 @@ class ReferralCreateReferralDataScreen extends Component {
                                 </View>
                             </View>
                             <View style={{marginTop: 15}}>
-                                <Text style={{color: '#cacaca'}}>Dokumen Riwayat Sakit Lainnya</Text>
+                                <Text style={{color: '#cacaca'}}>Dokumen Riwayat Sakit Lainnya (dalam format PDF)</Text>
                                 <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
                                     <TextInput value={
                                         this.state.docPemeriksaanLain == null ? 

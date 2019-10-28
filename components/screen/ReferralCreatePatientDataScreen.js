@@ -61,6 +61,7 @@ class ReferralCreatePatientDataScreen extends Component {
         marriage: [],
         province: [],
         city: [],
+        identityError: false,
     };
 
 
@@ -240,7 +241,9 @@ class ReferralCreatePatientDataScreen extends Component {
     };
 
     _searchPatient() {
-        this.setState({ spinner: !this.state.spinner, identityNumber: this.state.identityNumberChanged, isPatientNotFoundSelected: false });
+        this.setState({identityError: false})
+        if(this.state.identityNumberChanged.length > 0) {
+            this.setState({ spinner: !this.state.spinner, identityNumber: this.state.identityNumberChanged, isPatientNotFoundSelected: false });
 
         HealthcareAPI
             .get('/patient', {
@@ -257,9 +260,15 @@ class ReferralCreatePatientDataScreen extends Component {
                     this.setState({referralForm: tmp});
                 } else {
                     this._newPatient();
+                    tmp = this.state.referralForm;
+                    tmp.pasien.noIdentitas = this.state.identityNumber;
+                    this.setState({referralForm: tmp});
                 }
                 this.setState({ spinner: false, isSearched: true, isFound: patientFound});
             })
+        } else {
+            this.setState({identityError: true})
+        }
     };
 
     _setSearchResultScreen() {
@@ -958,6 +967,9 @@ class ReferralCreatePatientDataScreen extends Component {
                                         onSubmitEditing={() => this._searchPatient()}
                                         placeholder={'Nomor Identitas (KTP / SIM / Paspor)'}
                                         style={{ marginLeft: 4, borderBottomColor: '#c4c4c4', borderBottomWidth: 1 }} />
+                                        {
+                                            this.state.identityError &&
+                                            <Text style={{ color: '#f05d5e', fontSize: 12, marginLeft: 4 }}>Masukkan nomor identitas pasien</Text>}
                                 </View>
                             </View>
                             <View style={{ marginTop: 15 }}>

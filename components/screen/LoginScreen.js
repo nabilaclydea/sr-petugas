@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Alert, Button, TextInput, View, StyleSheet, TouchableOpacity, Text, Image } from 'react-native';
+import {NavigationActions, StackActions} from "react-navigation";
 import HealthcareAPI from "../api/HealthcareAPI";
 import Spinner from 'react-native-loading-spinner-overlay';
 import AsyncStorage from "@react-native-community/async-storage";
@@ -48,6 +49,16 @@ class LoginScreen extends Component {
         }
     }
 
+    _forgetPassword() {
+        const resetAction = StackActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({
+                routeName: "ForgetPasswordScreen",
+            })],
+        });
+        this.props.navigation.dispatch(resetAction);
+    }
+
     render() {
         return (
             <View style={styles.container}>
@@ -81,8 +92,8 @@ class LoginScreen extends Component {
                     <Text style={{color: '#ffffff', fontWeight: 'bold'}}>Login</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.buttonContainer}>
-                    <Text>Forgot your password?</Text>
+                <TouchableOpacity onPress={() => this._forgetPassword()} style={styles.buttonContainer}>
+                    <Text>Lupa password?</Text>
                 </TouchableOpacity>
 
             </View>

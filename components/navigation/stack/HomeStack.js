@@ -2,6 +2,9 @@ import {createStackNavigator} from 'react-navigation';
 import {
     HomeScreen,
     LoginScreen,
+    ForgetPasswordScreen,
+    CodePasswordScreen,
+    ResetPasswordScreen,
     ReferralCreatePatientDataScreen,
     ReferralCreateScheduleDestinationScreen,
     ReferralCreateReferralDataScreen,
@@ -17,6 +20,24 @@ const HomeStack = createStackNavigator(
         },
         LoginScreen: {
             screen: LoginScreen,
+            navigationOptions: {
+                header: null,
+            }
+        },
+        ForgetPasswordScreen: {
+            screen: ForgetPasswordScreen,
+            navigationOptions: {
+                header: null,
+            }
+        },
+        CodePasswordScreen: {
+            screen: CodePasswordScreen,
+            navigationOptions: {
+                header: null,
+            }
+        },
+        ResetPasswordScreen: {
+            screen: ResetPasswordScreen,
             navigationOptions: {
                 header: null,
             }
@@ -44,7 +65,11 @@ const HomeStack = createStackNavigator(
 
 HomeStack.navigationOptions = ({navigation}) => {
     let tabBarVisible = true;
-    if (navigation.state.index > 0 || navigation.state.routes[0].routeName === "LoginScreen") {
+    let routeName = navigation.state.routes[0].routeName;
+    let exception = routeName === "LoginScreen" || routeName === "ForgetPasswordScreen" || 
+        routeName === "CodePasswordScreen" || routeName === "ResetPasswordScreen";
+
+    if (navigation.state.index > 0 || exception) {
         tabBarVisible = false;
     }
 

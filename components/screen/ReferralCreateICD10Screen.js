@@ -32,6 +32,7 @@ class ReferralCreateICD10Screen extends Component {
         selectedICD10: [],
         visibleModal: false,
         spinner: false,
+        search: '',
     };
 
     componentWillMount() {
@@ -114,7 +115,7 @@ class ReferralCreateICD10Screen extends Component {
 
     _setICD10Screen() {
         return <FlatList
-            data={this.state.icd10}
+            data={this.state.icd10.filter(icd => icd.namaDiagnosis.toLowerCase().includes(this.state.search.toLowerCase()))}
             renderItem={({ item }) => this._renderICD10(item)}
             keyExtractor={(item) => item.idDiagnosis}
         />
@@ -205,19 +206,27 @@ class ReferralCreateICD10Screen extends Component {
                                                         }
                                                     )
                                                     .then(response => {
-                                                        let formData = new FormData();
-                                                        formData.append("docPemeriksaanDarah", {
-                                                            name: docPemeriksaanDarah.fileName,
-                                                            type: docPemeriksaanDarah.type,
-                                                            uri: docPemeriksaanDarah.uri
-                                                        });
-                                                        formData.append("docPemeriksaanLain", {
-                                                            name: docPemeriksaanLain.fileName,
-                                                            type: docPemeriksaanLain.type,
-                                                            uri: docPemeriksaanLain.uri
-                                                        });
-
+                                                        console.log(Object.keys(docPemeriksaanDarah).length)
+                                                        console.log(Object.keys(docPemeriksaanDarah).length > 0)
                                                         let referral = response.data;
+                                                        if(Object.keys(docPemeriksaanDarah).length > 0 || Object.keys(docPemeriksaanLain).length > 0) {
+                                                            this.setState({spinner: false});
+                                                            let formData = new FormData();
+                                                        if(Object.keys(docPemeriksaanDarah).length > 0) {
+                                                            formData.append("docPemeriksaanDarah", {
+                                                                name: docPemeriksaanDarah.fileName,
+                                                                type: docPemeriksaanDarah.type,
+                                                                uri: docPemeriksaanDarah.uri
+                                                            });
+                                                        }
+                                                        if(Object.keys(docPemeriksaanLain).length > 0) {
+                                                            formData.append("docPemeriksaanLain", {
+                                                                name: docPemeriksaanLain.fileName,
+                                                                type: docPemeriksaanLain.type,
+                                                                uri: docPemeriksaanLain.uri
+                                                            });
+                                                        }
+
                                                         let noRekamMedis = referral.noRekamMedis;
 
                                                         let url = '/referral/upload/' + noRekamMedis;
@@ -239,8 +248,18 @@ class ReferralCreateICD10Screen extends Component {
                                                                 })
                                                             })
                                                             .catch(error => console.log(error));
+                                                        } else {
+                                                            this.setState({spinner: false});
+                                                            navigate('ReferralCreateFinish', {
+                                                                user: this.props.navigation.getParam('user'),
+                                                                referral: referral,
+                                                                referralType: this.state.referralType,
+                                                                insurancePatientType: this.state.insurancePatientType
+                                                            })
+                                                        }
+                                                        
                                                     })
-                                                    .catch(error => console.log(error.response.data))
+                                                    .catch(error => console.log(error))
                                                 }
                                             }
                                             style={{width: 50 + '%', backgroundColor: '#28c667', borderBottomLeftRadius: 10}}>
@@ -281,7 +300,7 @@ class ReferralCreateICD10Screen extends Component {
                     <View style={{flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 + '%'}}>
                         <Image style={{width: 15, height: 15, marginRight: 25}}
                                source={require('../../assets/images/magnifier.png')}/>
-                        <TextInput placeholder={'Cari ICD-10'}
+                        <TextInput onChangeText={(search) => this.setState({search})} placeholder={'Cari ICD-10'}
                                    style={{color: '#cacaca', fontSize: 10, width: 90 + '%'}}/>
                     </View>
                 </View>

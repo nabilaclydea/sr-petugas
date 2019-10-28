@@ -105,8 +105,8 @@ android {
         applicationId "com.sirujuk"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 15
-        versionName "0.15"
+        versionCode 17
+        versionName "0.17"
     }
 
     signingConfigs {

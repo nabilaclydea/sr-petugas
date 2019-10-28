@@ -62,6 +62,7 @@ class ReferralCreateScheduleDestinationScreen extends Component {
                 } else {
                     tmp.rujukan.idTipeRuangan = 1;
                 }
+                this._bloodType();
                 this.setState({ referralForm: tmp });
             })
     }
@@ -139,6 +140,7 @@ class ReferralCreateScheduleDestinationScreen extends Component {
                     if(tmp.pasien.idGolonganDarah) {
                         tmp.pasien.idGolonganDarah = list[0].idGolonganDarah;
                     }
+                    console.log(list)
                     this.setState({bloods: list, referralForm: tmp});
                 }
             )
@@ -322,7 +324,7 @@ class ReferralCreateScheduleDestinationScreen extends Component {
                                     selectedValue={this.state.referralForm.pasien.idGolonganDarah}
                                     onValueChange={(itemValue, itemIndex) => {
                                         let tmp = this.state.referralForm;
-                                        tmp.pasie.idGolonganDarah = itemValue;
+                                        tmp.pasien.idGolonganDarah = itemValue;
                                         this.setState({ referralForm: tmp });
                                     }
                                 }

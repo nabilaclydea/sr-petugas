@@ -40,6 +40,7 @@ class ReferralCreateICD9Screen extends Component {
         spinner: false,
         icd9: [],
         selectedICD9: [],
+        search: '',
     };
 
     componentWillMount() {
@@ -122,7 +123,7 @@ class ReferralCreateICD9Screen extends Component {
 
     _setICD9Screen() {
         return <FlatList
-            data={this.state.icd9}
+            data={this.state.icd9.filter(icd => icd.namaDiagnosis.toLowerCase().includes(this.state.search.toLowerCase()))}
             renderItem={({ item }) => this._renderICD9(item)}
             keyExtractor={(item) => item.idDiagnosis}
         />
@@ -197,7 +198,7 @@ class ReferralCreateICD9Screen extends Component {
                     <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 5 + '%' }}>
                         <Image style={{ width: 15, height: 15, marginRight: 25 }}
                             source={require('../../assets/images/magnifier.png')} />
-                        <TextInput placeholder={'Cari ICD-9 CM'}
+                        <TextInput onChangeText={(search) => this.setState({search})} placeholder={'Cari ICD-9 CM'}
                             style={{ color: '#cacaca', fontSize: 10, width: 90 + '%' }} />
                     </View>
                 </View>

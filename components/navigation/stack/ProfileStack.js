@@ -1,5 +1,5 @@
 import {createStackNavigator} from 'react-navigation';
-import {ProfileScreen, ProfileEditScreen} from '../../screen'
+import {ProfileScreen, ProfileEditScreen, ResetPasswordScreen} from '../../screen'
 
 const ProfileStack = createStackNavigator(
     {
@@ -9,6 +9,9 @@ const ProfileStack = createStackNavigator(
         ProfileEditScreen: {
             screen: ProfileEditScreen,
         },
+        ResetPasswordScreen: {
+            screen: ResetPasswordScreen,
+        }
     },
 );
 
