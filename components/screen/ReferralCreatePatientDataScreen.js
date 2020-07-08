@@ -26,13 +26,15 @@ class ReferralCreatePatientDataScreen extends Component {
             headerTitle:
                 <View>
                     <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#000000' }}>
-                        {navigation.getParam('referralType') <= 1 ? 'Rujuk Poli' : 'Rujuk Emergency'}
+                        {navigation.getParam('referralType') <= 1 ? 'Rujuk Poli' :
+                        navigation.getParam('referralType') <= 2 ? 'Rujuk Emergency' :
+                        navigation.getParam('referralType') <= 3 ? 'Rujuk Maternal' : 'Rujuk Neonatal'}
                     </Text>
                 </View>
             ,
         };
     };
-    
+
     state = {
         isDateTimePickerVisible: false,
         referralType: this.props.navigation.getParam('referralType'),
@@ -73,7 +75,7 @@ class ReferralCreatePatientDataScreen extends Component {
     _newPatient() {
         let referralForm = { rujukan: {}, pasien: {}, jadwalPasien: {}, rekamMedis: {}, docPemeriksaanDarah: {}, docPemeriksaanLain: {} };
         this.setState({referralForm: referralForm});
-        
+
         axios
             .all([this._init(), this._insuranceType(), this._identityType(), this._gender(),
             this._religion(), this._education(), this._marriage(), this._province(), this._city()])
@@ -88,7 +90,7 @@ class ReferralCreatePatientDataScreen extends Component {
         }
         HealthcareAPI
             .get(url)
-            .then(response => 
+            .then(response =>
                 {
                     let tmp = response.data;
                     if(this.state.referralType <= 1) {
@@ -104,7 +106,7 @@ class ReferralCreatePatientDataScreen extends Component {
     _insuranceType() {
         HealthcareAPI
             .get('/patient/type/list')
-            .then(response => 
+            .then(response =>
                 {
                     let list = response.data;
                     let tmp = this.state.referralForm;
@@ -117,7 +119,7 @@ class ReferralCreatePatientDataScreen extends Component {
     _identityType() {
         HealthcareAPI
             .get('/patient/identity/type/list')
-            .then(response => 
+            .then(response =>
                 {
                     let list = response.data;
                     let tmp = this.state.referralForm;
@@ -130,7 +132,7 @@ class ReferralCreatePatientDataScreen extends Component {
     _gender() {
         HealthcareAPI
             .get('/gender/list')
-            .then(response => 
+            .then(response =>
                 {
                     let list = response.data;
                     let tmp = this.state.referralForm;
@@ -143,7 +145,7 @@ class ReferralCreatePatientDataScreen extends Component {
     _religion() {
         HealthcareAPI
             .get('/religion/list')
-            .then(response => 
+            .then(response =>
                 {
                     let list = response.data;
                     let tmp = this.state.referralForm;
@@ -156,7 +158,7 @@ class ReferralCreatePatientDataScreen extends Component {
     _education() {
         HealthcareAPI
             .get('/education/list')
-            .then(response => 
+            .then(response =>
                 {
                     let list = response.data;
                     let tmp = this.state.referralForm;
@@ -169,7 +171,7 @@ class ReferralCreatePatientDataScreen extends Component {
     _marriage() {
         HealthcareAPI
             .get('/marriage/list')
-            .then(response => 
+            .then(response =>
                 {
                     let list = response.data;
                     let tmp = this.state.referralForm;
@@ -182,7 +184,7 @@ class ReferralCreatePatientDataScreen extends Component {
     _province() {
         HealthcareAPI
             .get('/province/list')
-            .then(response => 
+            .then(response =>
                 {
                     let list = response.data;
                     let tmp = this.state.referralForm;
@@ -195,7 +197,7 @@ class ReferralCreatePatientDataScreen extends Component {
     _city() {
         HealthcareAPI
             .get('/city/list')
-            .then(response => 
+            .then(response =>
                 {
                     let list = response.data;
                     let tmp = this.state.referralForm;
@@ -816,16 +818,24 @@ class ReferralCreatePatientDataScreen extends Component {
 
             required[inputRequiredData[index]] = tmp;
             inputRequired[index] = tmp;
-        });        
+        });
 
         if (result) {
+            if (this.state.referralType == 3 || this.state.referralType == 4){
+                navigate('MaternalNeonatalDestinationScreen', {
+                    referralType: this.state.referralType,
+                    city: this.state.city,
+                    referralForm: this.state.referralForm,
+                    insurancePatientType: this.state.insurancePatientType
+                });
+            } else {
             navigate('ReferralCreateScheduleDestinationScreen', {
                 referralType: this.state.referralType,
                 city: this.state.city,
                 referralForm: this.state.referralForm,
                 insurancePatientType: this.state.insurancePatientType
+            });
             }
-            );
         } else {
             let message = 'Pastikan seluruh kolom yang bertanda bintang (*) sudah terisi.';
 
@@ -1009,7 +1019,7 @@ class ReferralCreatePatientDataScreen extends Component {
                                             }}
                                             placeholder={this.state.referralForm.rujukan.statusBayar <= 2 ? 'Nomor BPJS' : 'Nomor Asuransi Lain'}
                                             value={
-                                                this.state.referralForm.rujukan.statusBayar <=2 ? 
+                                                this.state.referralForm.rujukan.statusBayar <=2 ?
                                                 this.state.referralForm.pasien.noBpjs : this.state.referralForm.pasien.noAsuransiLain
                                             }
                                             onChangeText={(text) => {
@@ -1023,8 +1033,8 @@ class ReferralCreatePatientDataScreen extends Component {
                                             }}
                                             style={{
                                                 marginLeft: 4,
-                                                borderBottomColor: 
-                                                    (this._isError('noBpjs') && this._isError('noAsuransiLain')) ? 
+                                                borderBottomColor:
+                                                    (this._isError('noBpjs') && this._isError('noAsuransiLain')) ?
                                                     '#c4c4c4' : '#f05d5e',
                                                 borderBottomWidth: 1
                                             }}

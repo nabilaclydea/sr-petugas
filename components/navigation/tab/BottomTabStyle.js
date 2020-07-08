@@ -25,9 +25,14 @@ class BottomTabStyle extends Component {
                     <Text style={[styles.tabTitle, {color: (index == 2 ? '#00818c' : '#aeaeae')}]}>Rujukan Keluar</Text>
                 </TouchableOpacity>
 
+                <TouchableOpacity style={styles.tabBox} onPress={() => navigate('Infografis')}>
+                    <Icon name={'desktop-mac-dashboard'} size={24} color={index == 3 ? '#00818c' : '#aeaeae'} />
+                    <Text style={[styles.tabTitle, {color: (index == 3 ? '#00818c' : '#aeaeae')}]}>Infografis</Text>
+                </TouchableOpacity>
+
                 <TouchableOpacity style={styles.tabBox} onPress={() => navigate('Profil')}>
-                    <Icon name={'account'} size={24} color={index == 3 ? '#00818c' : '#aeaeae'} />
-                    <Text style={[styles.tabTitle, {color: (index == 3 ? '#00818c' : '#aeaeae')}]}>Profil</Text>
+                    <Icon name={'account'} size={24} color={index == 4 ? '#00818c' : '#aeaeae'} />
+                    <Text style={[styles.tabTitle, {color: (index == 4 ? '#00818c' : '#aeaeae')}]}>Profil</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -44,7 +49,7 @@ const styles = StyleSheet.create({
     tabBox: {
         justifyContent: 'center',
         alignItems: 'center',
-        width: 25 + '%',
+        width: 20 + '%',
     },
     tabIcon: {
         width: 24,
