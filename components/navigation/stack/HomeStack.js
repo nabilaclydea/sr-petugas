@@ -10,78 +10,78 @@ import {
   ReferralCreateReferralDataScreen,
   ReferralCreateICD10Screen,
   ReferralCreateICD9Screen,
-  ReferralCreateFinish
+  ReferralCreateFinish,
 } from "../../screen";
-import {
-  MaternalNeonatalDestinationScreen,
-  MaternalNeonatalReferralDataScreen,
-  MaternalNeonatalICD9Screen,
-  MaternalNeonatalICD10Screen,
-  MaternalNeonatalFinishScreen
-} from "../../screen/maternalneonatalreferral";
+// import {
+//   MaternalNeonatalDestinationScreen,
+//   MaternalNeonatalReferralDataScreen,
+//   MaternalNeonatalICD9Screen,
+//   MaternalNeonatalICD10Screen,
+//   MaternalNeonatalFinishScreen
+// } from "../../screen/maternalneonatalreferral";
 
 const HomeStack = createStackNavigator({
   HomeScreen: {
-    screen: HomeScreen
+    screen: HomeScreen,
   },
   LoginScreen: {
     screen: LoginScreen,
     navigationOptions: {
-      header: null
-    }
+      header: null,
+    },
   },
   ForgetPasswordScreen: {
     screen: ForgetPasswordScreen,
     navigationOptions: {
-      header: null
-    }
+      header: null,
+    },
   },
   CodePasswordScreen: {
     screen: CodePasswordScreen,
     navigationOptions: {
-      header: null
-    }
+      header: null,
+    },
   },
   ResetPasswordScreen: {
     screen: ResetPasswordScreen,
     navigationOptions: {
-      header: null
-    }
+      header: null,
+    },
   },
   ReferralCreatePatientDataScreen: {
-    screen: ReferralCreatePatientDataScreen
+    screen: ReferralCreatePatientDataScreen,
   },
   ReferralCreateScheduleDestinationScreen: {
-    screen: ReferralCreateScheduleDestinationScreen
+    screen: ReferralCreateScheduleDestinationScreen,
   },
   ReferralCreateReferralDataScreen: {
-    screen: ReferralCreateReferralDataScreen
+    screen: ReferralCreateReferralDataScreen,
   },
   ReferralCreateICD10Screen: {
-    screen: ReferralCreateICD10Screen
+    screen: ReferralCreateICD10Screen,
   },
   ReferralCreateICD9Screen: {
-    screen: ReferralCreateICD9Screen
+    screen: ReferralCreateICD9Screen,
   },
   ReferralCreateFinish: {
-    screen: ReferralCreateFinish
+    screen: ReferralCreateFinish,
   },
 
-  MaternalNeonatalDestinationScreen: {
-    screen: MaternalNeonatalDestinationScreen
-  },
-  MaternalNeonatalReferralDataScreen: {
-    screen: MaternalNeonatalReferralDataScreen
-  },
-  MaternalNeonatalICD9Screen: {
-    screen: MaternalNeonatalICD9Screen
-  },
-  MaternalNeonatalICD10Screen: {
-    screen: MaternalNeonatalICD10Screen
-  },
-  MaternalNeonatalFinishScreen: {
-    screen: MaternalNeonatalFinishScreen
-  }
+  //   MaternalNeonatalDestinationScreen: {
+  //     screen: MaternalNeonatalDestinationScreen,
+  //   },
+  //   MaternalNeonatalReferralDataScreen: {
+  //     screen: MaternalNeonatalReferralDataScreen,
+  //   },
+  //   MaternalNeonatalICD9Screen: {
+  //     screen: MaternalNeonatalICD9Screen,
+  //   },
+  //   MaternalNeonatalICD10Screen: {
+  //     screen: MaternalNeonatalICD10Screen,
+  //   },
+  //   MaternalNeonatalFinishScreen: {
+  //     screen: MaternalNeonatalFinishScreen,
+  //   },
 });
 
 HomeStack.navigationOptions = ({ navigation }) => {
@@ -98,7 +98,7 @@ HomeStack.navigationOptions = ({ navigation }) => {
   }
 
   return {
-    tabBarVisible
+    tabBarVisible,
   };
 };
 
