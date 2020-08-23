@@ -13,8 +13,9 @@ import {
 import { PieChart } from "react-native-chart-kit";
 import { BarChart, Grid, YAxis } from "react-native-svg-charts";
 import * as scale from "d3-scale";
+import HealthcareAPI from "../api/HealthcareAPI";
 
-class ReferralInfografisScreen extends React.PureComponent {
+class ReferralInfografisScreenMaternalNeonatal extends React.PureComponent {
   // static navigationOptions = {
   //   title: "Statistik Rujukan per Faskes"
   // };
@@ -22,27 +23,56 @@ class ReferralInfografisScreen extends React.PureComponent {
     header: null,
   };
 
+  state={
+    
+    // topItems:[],
+    counter:0,
+    // counter1:""
+  };
+
+  countInc(n){
+    this.state.items[n].count+=1
+    this.forceUpdate()
+  }
+
+  componentDidMount(){
+    const namaRujuk=['poli', 'emergency', 'maternal', 'neonatal'];
+    for(i=2346;i<2347;i++){
+      for(j=0;j<4;j++){
+        HealthcareAPI.get('/referral/'+namaRujuk[j]+'/in?id='+i).then(response => {
+          counter+=response.data.length
+          this.forceUpdate()
+        })
+      }
+    }
+
+    // const myData = [].concat(this.state.items).sort((a, b) => a.count > b.count ? 1 : -1);
+    // this.setState({
+    //   topItems: myData
+    // });
+  }
+
   render() {
     const data1 = [
       {
-        value: 50,
-        label: "Puskesmas Pamulang",
+        value: this.state.counter,
+        label: "11",
       },
       {
-        value: 40,
-        label: "Puskesmas Serpong",
+        value: 21,
+        label: "11",
       },
       {
-        value: 30,
-        label: "Puskesmas Pondok Benda",
+        value: 31,
+        label: "11",
       },
       {
-        value: 20,
-        label: "Puskesmas Ciputat",
+        value: 41,
+        label: "11",
       },
       {
-        value: 10,
-        label: "Puskesmas Pisangan",
+        value: 60,
+        label: "11",
       },
     ];
     const data2 = [
@@ -283,4 +313,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ReferralInfografisScreen;
+export default ReferralInfografisScreenMaternalNeonatal;

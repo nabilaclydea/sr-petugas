@@ -1,17 +1,21 @@
 import React from "react";
 import { createMaterialTopTabNavigator } from "react-navigation";
-import { InfografisStack } from "../stack";
+import { 
+  InfografisStackPoli,
+  InfografisStackEmergency,
+  InfografisStackMaternalNeonatal
+ } from "../stack";
 
 const InfografisTab = createMaterialTopTabNavigator(
   {
     Poli: {
-      screen: InfografisStack
+      screen: InfografisStackPoli
     },
     Emergency: {
-      screen: InfografisStack
+      screen: InfografisStackEmergency
     },
     Maternal_Neonatal: {
-      screen: InfografisStack
+      screen: InfografisStackMaternalNeonatal
     }
   },
   {
