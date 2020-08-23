@@ -155,7 +155,7 @@ class ReferralInfografisScreenEmergency extends React.PureComponent {
         </View> */}
         <ScrollView>
           <View style={styles.title}>
-            <Text style={styles.titleText}>Rujukan Masuk Terbanyak</Text>
+            <Text style={styles.titleText}>Rujuk Emergency Terbanyak</Text>
           </View>
           <View
             style={{

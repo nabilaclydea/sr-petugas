@@ -26,21 +26,21 @@ class ReferralInfografisScreenMaternalNeonatal extends React.PureComponent {
   state={
     
     // topItems:[],
-    counter:0,
+    counter:0
     // counter1:""
   };
 
-  countInc(n){
-    this.state.items[n].count+=1
-    this.forceUpdate()
-  }
+  // countInc(n){
+  //   this.state.items[n].count+=1
+  //   this.forceUpdate()
+  // }
 
   componentDidMount(){
     const namaRujuk=['poli', 'emergency', 'maternal', 'neonatal'];
     for(i=2346;i<2347;i++){
       for(j=0;j<4;j++){
         HealthcareAPI.get('/referral/'+namaRujuk[j]+'/in?id='+i).then(response => {
-          counter+=response.data.length
+          this.state.counter+=response.data.length
           this.forceUpdate()
         })
       }
