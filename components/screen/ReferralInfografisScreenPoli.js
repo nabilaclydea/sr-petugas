@@ -46,16 +46,22 @@ class ReferralInfografisScreenPoli extends React.PureComponent {
       {name:"Poli Saraf",count:0},
       {name:"Poli THT",count:0},
       {name:"Poli Umum",count:0}
-    ]
+    ],
+    sortedItems:[
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0}]
   };
 
   countInc(n){
     this.state.items[n].count+=1
     this.forceUpdate()
   }
-
+  
   componentDidMount(){
-    for(i=0;i<3000;i++){
+    for(i=2346;i<2347;i++){
       HealthcareAPI.get('/referral/poli/in?id='+i).then(response => {
         for(j=0;j<response.data.length;j++){
           const jenisPoli=response.data[j].poli.namaJenisPoli
@@ -125,29 +131,33 @@ class ReferralInfografisScreenPoli extends React.PureComponent {
         }
       })
     }
+    const sorting=this.state.items.sort(function(a,b){
+      return parseInt(a.count)<parseInt(b.count);
+    })
+    this.setState({sortedItems:sorting})
   }
 
   render() {
     const data1 = [
       {
-        value: this.state.items[0].count,
-        label: this.state.items[0].name,
+        value: this.state.sortedItems[0].count,
+        label: this.state.sortedItems[0].name,
       },
       {
-        value: this.state.items[1].count,
-        label: this.state.items[1].name,
+        value: this.state.sortedItems[1].count,
+        label: this.state.sortedItems[1].name,
       },
       {
-        value: this.state.items[2].count,
-        label: this.state.items[2].name,
+        value: this.state.sortedItems[2].count,
+        label: this.state.sortedItems[2].name,
       },
       {
-        value: this.state.items[3].count,
-        label: this.state.items[3].name,
+        value: this.state.sortedItems[3].count,
+        label: this.state.sortedItems[3].name,
       },
       {
-        value: this.state.items[4].count,
-        label: this.state.items[4].name,
+        value: this.state.sortedItems[4].count,
+        label: this.state.sortedItems[4].name,
       },
     ];
     return (

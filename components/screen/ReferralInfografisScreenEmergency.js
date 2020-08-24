@@ -37,7 +37,13 @@ class ReferralInfografisScreenEmergency extends React.PureComponent {
       {name:"Kelas VIP",count:0},
       {name:"Poliklinik",count:0},
       {name:"IGD",count:0}
-    ]
+    ],
+    sortedItems:[
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0}]
   };
 
   countInc(n){
@@ -89,29 +95,33 @@ class ReferralInfografisScreenEmergency extends React.PureComponent {
         }
       })
     }
+    const sorting=this.state.items.sort(function(a,b){
+      return parseInt(a.count)<parseInt(b.count);
+    })
+    this.setState({sortedItems:sorting})
   }
 
   render() {
     const data1 = [
       {
-        value: this.state.items[0].count,
-        label: this.state.items[0].name,
+        value: this.state.sortedItems[0].count,
+        label: this.state.sortedItems[0].name,
       },
       {
-        value: this.state.items[1].count,
-        label: this.state.items[1].name,
+        value: this.state.sortedItems[1].count,
+        label: this.state.sortedItems[1].name,
       },
       {
-        value: this.state.items[2].count,
-        label: this.state.items[2].name,
+        value: this.state.sortedItems[2].count,
+        label: this.state.sortedItems[2].name,
       },
       {
-        value: this.state.items[3].count,
-        label: this.state.items[3].name,
+        value: this.state.sortedItems[3].count,
+        label: this.state.sortedItems[3].name,
       },
       {
-        value: this.state.items[4].count,
-        label: this.state.items[4].name,
+        value: this.state.sortedItems[4].count,
+        label: this.state.sortedItems[4].name,
       },
     ];
     return (
