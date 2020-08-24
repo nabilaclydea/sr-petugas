@@ -54,110 +54,52 @@ class ReferralInfografisScreenPoli extends React.PureComponent {
       {name:"",count:0},
       {name:"",count:0}]
   };
-
-  countInc(n){
-    this.state.items[n].count+=1
-    this.forceUpdate()
-  }
   
   componentDidMount(){
-    for(i=2346;i<2347;i++){
+    for(i=0;i<3000;i++){
       HealthcareAPI.get('/referral/poli/in?id='+i).then(response => {
         for(j=0;j<response.data.length;j++){
           const jenisPoli=response.data[j].poli.namaJenisPoli
-          if(jenisPoli=="Poli Akupunktur"){
-            this.countInc(0)
-          }
-          else if(jenisPoli=="Poli Anak"){
-            this.countInc(1)
-          }
-          else if(jenisPoli=="Poli Anestesi"){
-            this.countInc(2)
-          }
-          else if(jenisPoli=="Poli Bedah"){
-            this.countInc(3)
-          }
-          else if(jenisPoli=="Poli Bedah Orthopaedi"){
-            this.countInc(4)
-          }
-          else if(jenisPoli=="Poli Bedah Plastik"){
-            this.countInc(5)
-          }
-          else if(jenisPoli=="Poli Bedah Saraf"){
-            this.countInc(6)
-          }
-          else if(jenisPoli=="Poli Gigi dan Mulut"){
-            this.countInc(7)
-          }
-          else if(jenisPoli=="Poli Gizi"){
-            this.countInc(8)
-          }
-          else if(jenisPoli=="Poli Jantung"){
-            this.countInc(9)
-          }
-          else if(jenisPoli=="Poli Kebidanan dan Kandungan"){
-            this.countInc(10)
-          }
-          else if(jenisPoli=="Poli Kulit dan Kelamin"){
-            this.countInc(11)
-          }
-          else if(jenisPoli=="Poli Mata"){
-            this.countInc(12)
-          }
-          else if(jenisPoli=="Poli Medik Dasar"){
-            this.countInc(13)
-          }
-          else if(jenisPoli=="Poli Paru"){
-            this.countInc(14)
-          }
-          else if(jenisPoli=="Poli Penyakit Dalam"){
-            this.countInc(15)
-          }
-          else if(jenisPoli=="Poli PPKT"){
-            this.countInc(16)
-          }
-          else if(jenisPoli=="Poli Rehabilitasi Medik"){
-            this.countInc(17)
-          }
-          else if(jenisPoli=="Poli Saraf"){
-            this.countInc(18)
-          }
-          else if(jenisPoli=="Poli THT"){
-            this.countInc(19)
-          }
-          else if(jenisPoli=="Poli Umum"){
-            this.countInc(20)
-          }
+          var index;
+          this.state.items.some(function(item, n){
+            if(item.name==jenisPoli){
+              index=n
+              return true
+            }
+          })
+          this.state.items[index].count+=1
+          this.forceUpdate()
         }
       })
     }
-    const sorting=this.state.items.sort(function(a,b){
-      return parseInt(a.count)<parseInt(b.count);
-    })
+    const sorting=this.state.items
+    // .sort(function(a,b){
+    //   return parseInt(a.count)<parseInt(b.count);
+    // })
     this.setState({sortedItems:sorting})
   }
 
   render() {
     const data1 = [
       {
-        value: this.state.sortedItems[0].count,
-        label: this.state.sortedItems[0].name,
+        value: this.state.items[0].count,
+        label: this.state.items[0].name+" ("+this.state.items[0].count+")",
       },
       {
-        value: this.state.sortedItems[1].count,
-        label: this.state.sortedItems[1].name,
+        value: this.state.items[5].count,
+        label: this.state.items[5].name+" ("+this.state.items[5].count+")",
       },
       {
-        value: this.state.sortedItems[2].count,
-        label: this.state.sortedItems[2].name,
+        value: this.state.items[7].count,
+        label: this.state.items[7].name+" ("+this.state.items[7].count+")",
       },
       {
-        value: this.state.sortedItems[3].count,
-        label: this.state.sortedItems[3].name,
+        value: this.state.items[1].count,
+        label: this.state.items[1].name+" ("+this.state.items[1].count+")",
       },
       {
-        value: this.state.sortedItems[4].count,
-        label: this.state.sortedItems[4].name,
+        value: this.state.items[3].count,
+        label: this.state.items[3].name+" ("+this.state.items[3].count+")",
       },
     ];
     return (

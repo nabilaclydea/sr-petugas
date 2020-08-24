@@ -56,48 +56,22 @@ class ReferralInfografisScreenEmergency extends React.PureComponent {
       HealthcareAPI.get('/referral/emergency/in?id='+i).then(response => {
         for(j=0;j<response.data.length;j++){
           const tipeRuangan=response.data[j].ruangan.namaTipeRuangan
-          if(tipeRuangan=="ICU"){
-            this.countInc(0)
-          }
-          else if(tipeRuangan=="NICU"){
-            this.countInc(1)
-          }
-          else if(tipeRuangan=="PICU"){
-            this.countInc(2)
-          }
-          else if(tipeRuangan=="HICU"){
-            this.countInc(3)
-          }
-          else if(tipeRuangan=="ICCU"){
-            this.countInc(4)
-          }
-          else if(tipeRuangan=="PONEK"){
-            this.countInc(5)
-          }
-          else if(tipeRuangan=="Kelas III"){
-            this.countInc(6)
-          }
-          else if(tipeRuangan=="Kelas II"){
-            this.countInc(7)
-          }
-          else if(tipeRuangan=="Kelas I"){
-            this.countInc(8)
-          }
-          else if(tipeRuangan=="Kelas VIP"){
-            this.countInc(9)
-          }
-          else if(tipeRuangan=="Poliklinik"){
-            this.countInc(10)
-          }
-          else if(tipeRuangan=="IGD"){
-            this.countInc(11)
-          }
+          var index;
+          this.state.items.some(function(item, n){
+            if(item.name==tipeRuangan){
+              index=n
+              return true
+            }
+          })
+          this.state.items[index].count+=1
+          this.forceUpdate()
         }
       })
     }
-    const sorting=this.state.items.sort(function(a,b){
-      return parseInt(a.count)<parseInt(b.count);
-    })
+    const sorting=this.state.items
+    // .sort(function(a,b){
+    //   return parseInt(a.count)<parseInt(b.count);
+    // })
     this.setState({sortedItems:sorting})
   }
 
@@ -105,23 +79,23 @@ class ReferralInfografisScreenEmergency extends React.PureComponent {
     const data1 = [
       {
         value: this.state.sortedItems[0].count,
-        label: this.state.sortedItems[0].name,
+        label: this.state.sortedItems[0].name+" ("+this.state.sortedItems[0].count+")",
       },
       {
         value: this.state.sortedItems[1].count,
-        label: this.state.sortedItems[1].name,
+        label: this.state.sortedItems[1].name+" ("+this.state.sortedItems[1].count+")",
       },
       {
         value: this.state.sortedItems[2].count,
-        label: this.state.sortedItems[2].name,
+        label: this.state.sortedItems[2].name+" ("+this.state.sortedItems[2].count+")",
       },
       {
         value: this.state.sortedItems[3].count,
-        label: this.state.sortedItems[3].name,
+        label: this.state.sortedItems[3].name+" ("+this.state.sortedItems[3].count+")",
       },
       {
         value: this.state.sortedItems[4].count,
-        label: this.state.sortedItems[4].name,
+        label: this.state.sortedItems[4].name+" ("+this.state.sortedItems[4].count+")",
       },
     ];
     return (
