@@ -59,8 +59,8 @@ class ReferralInfografisScreenPoli extends React.PureComponent {
     for(i=0;i<3000;i++){
       HealthcareAPI.get('/referral/poli/in?id='+i).then(response => {
         for(j=0;j<response.data.length;j++){
+          var index=null;
           const jenisPoli=response.data[j].poli.namaJenisPoli
-          var index;
           this.state.items.some(function(item, n){
             if(item.name==jenisPoli){
               index=n

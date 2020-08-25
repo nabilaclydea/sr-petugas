@@ -24,26 +24,71 @@ class ReferralInfografisScreenMaternalNeonatal extends React.PureComponent {
   };
 
   state={
-    items:[{name:"", count:0}],
+    items:[
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0}],
+    items2:[
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0}],
+    diagnosisItems:[
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0}],
     sortedItems:[
       {name:"",count:0},
       {name:"",count:0},
       {name:"",count:0},
       {name:"",count:0},
-      {name:"",count:0}]
+      {name:"",count:0}],
+    sortedItems2:[
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0}],
+    sortedDiagnosisItems:[
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0}],
   };
 
   componentDidMount(){
-    const namaRujuk=['poli', 'emergency', 'maternal', 'neonatal'];
-    for(i=2346;i<2347;i++){
-      for(j=0;j<4;j++){
+    const namaRujuk=['maternal', 'neonatal'];
+    for(i=0;i<3000;i++){
+      for(j=0;j<2;j++){
         HealthcareAPI.get('/referral/'+namaRujuk[j]+'/in?id='+i).then(response => {
           for(k=0;k<response.data.length;k++){
-            const namaRS=response.data[j].faskesAsal.nama
-            var index;
+            var index=null;
+            var index2=null;
+            var indexDiagnosis=null;
+            const namaRSout=response.data[k].faskesAsal.nama
+            const namaRSin=response.data[k].faskesTujuan.nama
+            const namaDiagnosis=response.data[k].rekamMedis.diagnosisText
             this.state.items.some(function(item, n){
-              if(item.name==namaRS){
+              if(item.name==namaRSout){
                 index=n
+                return true
+              }
+            })
+            this.state.items2.some(function(item, n){
+              if(item.name==namaRSin){
+                index2=n
+                return true
+              }
+            })
+            this.state.diagnosisItems.some(function(item, n){
+              if(item.name==namaDiagnosis){
+                indexDiagnosis=n
                 return true
               }
             })
@@ -52,15 +97,28 @@ class ReferralInfografisScreenMaternalNeonatal extends React.PureComponent {
               this.forceUpdate()
             }
             else{
-              if(this.state.items.length==1){
-                const addToItems=[{name:namaRS, count:1}]
-                this.setState({items:addToItems})
-              }
-              else{
-                const addToItems=this.state.items.concat[{name:namaRS, count:1}]
-                this.setState({items:addToItems})
-              }
+              const addToItems=[{name:namaRSout, count:1}]
+              this.setState({items:this.state.items.concat(addToItems)})
             }
+            if(index2!=null){
+              this.state.items2[index2].count+=1
+              this.forceUpdate()
+            }
+            else{
+              const addToItems=[{name:namaRSin, count:1}]
+              this.setState({items2:this.state.items2.concat(addToItems)})
+            }
+            if(indexDiagnosis!=null){
+              this.state.diagnosisItems[indexDiagnosis].count+=1
+              this.forceUpdate()
+            }
+            else{
+              const addToItems=[{name:namaDiagnosis, count:1}]
+              this.setState({diagnosisItems:this.state.diagnosisItems.concat(addToItems)})
+            }
+            this.sortIt()
+            this.sortIt2()
+            this.sortItDiagnosis()
           }
         })
       }
@@ -73,12 +131,24 @@ class ReferralInfografisScreenMaternalNeonatal extends React.PureComponent {
     })
     this.setState({sortedItems:sorting})
   }
+  sortIt2(){
+    const sorting=this.state.items2.sort(function(a,b){
+      return parseInt(a.count)<parseInt(b.count);
+    })
+    this.setState({sortedItems2:sorting})
+  }
+  sortItDiagnosis(){
+    const sorting=this.state.diagnosisItems.sort(function(a,b){
+      return parseInt(a.count)<parseInt(b.count);
+    })
+    this.setState({sortedDiagnosisItems:sorting})
+  }
 
   render() {
     const data1 = [
       {
-        value: this.state.items[0].count,
-        label: this.state.items[0].name+" ("+this.state.items[0].count+")",
+        value: this.state.sortedItems[0].count,
+        label: this.state.sortedItems[0].name+" ("+this.state.sortedItems[0].count+")",
       },
       {
         value: this.state.sortedItems[1].count,
@@ -99,24 +169,24 @@ class ReferralInfografisScreenMaternalNeonatal extends React.PureComponent {
     ];
     const data2 = [
       {
-        value: 50,
-        label: "RSU Tangsel",
+        value: this.state.sortedItems2[0].count,
+        label: this.state.sortedItems2[0].name+" ("+this.state.sortedItems2[0].count+")",
       },
       {
-        value: 40,
-        label: "RS Hermina",
+        value: this.state.sortedItems2[1].count,
+        label: this.state.sortedItems2[1].name+" ("+this.state.sortedItems2[1].count+")",
       },
       {
-        value: 30,
-        label: "RS Sari Asih",
+        value: this.state.sortedItems2[2].count,
+        label: this.state.sortedItems2[2].name+" ("+this.state.sortedItems2[2].count+")",
       },
       {
-        value: 20,
-        label: "RS Buah Hati",
+        value: this.state.sortedItems2[3].count,
+        label: this.state.sortedItems2[3].name+" ("+this.state.sortedItems2[3].count+")",
       },
       {
-        value: 10,
-        label: "RS Vitalaya",
+        value: this.state.sortedItems2[4].count,
+        label: this.state.sortedItems2[4].name+" ("+this.state.sortedItems2[4].count+")",
       },
     ];
     return (
@@ -256,40 +326,40 @@ class ReferralInfografisScreenMaternalNeonatal extends React.PureComponent {
             <PieChart
               data={[
                 {
-                  name: "Hemorrhage",
-                  population: 48.0,
+                  name: this.state.sortedDiagnosisItems[0].name,
+                  population: this.state.sortedDiagnosisItems[0].count,
                   color: "rgba(131, 167, 234, 1)",
                   legendFontColor: "black",
                   legendFontSize: 11,
                   marginLeft: 5,
                 },
                 {
-                  name: "Preterm labor",
-                  population: 39.2,
+                  name: this.state.sortedDiagnosisItems[1].name,
+                  population: this.state.sortedDiagnosisItems[1].count,
                   color: "red",
                   legendFontColor: "black",
                   legendFontSize: 11,
                   marginLeft: 5,
                 },
                 {
-                  name: "Long labor",
-                  population: 34.2,
+                  name: this.state.sortedDiagnosisItems[2].name,
+                  population: this.state.sortedDiagnosisItems[2].count,
                   color: "yellow",
                   legendFontColor: "black",
                   legendFontSize: 11,
                   marginLeft: 5,
                 },
                 {
-                  name: "Sepsis",
-                  population: 14.2,
+                  name: this.state.sortedDiagnosisItems[3].name,
+                  population: this.state.sortedDiagnosisItems[3].count,
                   color: "orange",
                   legendFontColor: "black",
                   legendFontSize: 11,
                   marginLeft: 5,
                 },
                 {
-                  name: "Birth trauma",
-                  population: 12.4,
+                  name: this.state.sortedDiagnosisItems[4].name,
+                  population: this.state.sortedDiagnosisItems[4].count,
                   color: "green",
                   legendFontColor: "black",
                   legendFontSize: 11,

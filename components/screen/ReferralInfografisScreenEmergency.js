@@ -50,8 +50,8 @@ class ReferralInfografisScreenEmergency extends React.PureComponent {
     for(i=0;i<3000;i++){
       HealthcareAPI.get('/referral/emergency/in?id='+i).then(response => {
         for(j=0;j<response.data.length;j++){
+          var index=null;
           const tipeRuangan=response.data[j].ruangan.namaTipeRuangan
-          var index;
           this.state.items.some(function(item, n){
             if(item.name==tipeRuangan){
               index=n
