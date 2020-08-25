@@ -24,13 +24,14 @@ class ReferralInfografisScreenMaternalNeonatal extends React.PureComponent {
   };
 
   state={
-    Items:[{name:"", count:0}]
+    items:[{name:"", count:0}],
+    sortedItems:[
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0},
+      {name:"",count:0}]
   };
-
-  countInc(n){
-    this.state.items[n].count+=1
-    this.forceUpdate()
-  }
 
   componentDidMount(){
     const namaRujuk=['poli', 'emergency', 'maternal', 'neonatal'];
@@ -39,45 +40,61 @@ class ReferralInfografisScreenMaternalNeonatal extends React.PureComponent {
         HealthcareAPI.get('/referral/'+namaRujuk[j]+'/in?id='+i).then(response => {
           for(k=0;k<response.data.length;k++){
             const namaRS=response.data[j].faskesAsal.nama
-            if(this.state.Items.includes({name:namaRS})){
-              const index=this.state.Items.indexOf({name:RS})
-              this.countInc(index)
+            var index;
+            this.state.items.some(function(item, n){
+              if(item.name==namaRS){
+                index=n
+                return true
+              }
+            })
+            if(index!=null){
+              this.state.items[index].count+=1
+              this.forceUpdate()
             }
             else{
-              const addToItems=this.state.Items.concat[{name:namaRS, count:1}]
+              if(this.state.items.length==1){
+                const addToItems=[{name:namaRS, count:1}]
+                this.setState({items:addToItems})
+              }
+              else{
+                const addToItems=this.state.items.concat[{name:namaRS, count:1}]
+                this.setState({items:addToItems})
+              }
             }
           }
         })
       }
     }
+  }
 
-    // const myData = [].concat(this.state.items).sort((a, b) => a.count > b.count ? 1 : -1);
-    // this.setState({
-    //   topItems: myData
-    // });
+  sortIt(){
+    const sorting=this.state.items.sort(function(a,b){
+      return parseInt(a.count)<parseInt(b.count);
+    })
+    this.setState({sortedItems:sorting})
   }
 
   render() {
     const data1 = [
       {
-        value: this.state.counter,
-        label: "11",
+        value: this.state.items[0].count,
+        label: this.state.items[0].name+" ("+this.state.items[0].count+")",
       },
       {
-        value: 21,
-        label: "11",
+        value: this.state.sortedItems[1].count,
+        label: this.state.sortedItems[1].name+" ("+this.state.sortedItems[1].count+")",
       },
       {
-        value: 31,
-        label: "11",
+        value: this.state.sortedItems[2].count,
+        label: this.state.sortedItems[2].name+" ("+this.state.sortedItems[2].count+")",
       },
       {
-        value: 41,
-        label: "11",
+        value: this.state.sortedItems[3].count,
+        label: this.state.sortedItems[3].name+" ("+this.state.sortedItems[3].count+")",
       },
       {
-        value: 60,
-        label: "11",
+        value: this.state.sortedItems[4].count,
+        label: this.state.sortedItems[4].name+" ("+this.state.sortedItems[4].count+")",
       },
     ];
     const data2 = [

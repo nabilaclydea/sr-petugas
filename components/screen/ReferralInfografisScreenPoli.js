@@ -55,7 +55,7 @@ class ReferralInfografisScreenPoli extends React.PureComponent {
       {name:"",count:0}]
   };
   
-  componentDidMount(){
+  async componentDidMount(){
     for(i=0;i<3000;i++){
       HealthcareAPI.get('/referral/poli/in?id='+i).then(response => {
         for(j=0;j<response.data.length;j++){
@@ -69,37 +69,40 @@ class ReferralInfografisScreenPoli extends React.PureComponent {
           })
           this.state.items[index].count+=1
           this.forceUpdate()
+          this.sortIt()
         }
       })
     }
-    const sorting=this.state.items
-    // .sort(function(a,b){
-    //   return parseInt(a.count)<parseInt(b.count);
-    // })
+  }
+
+  sortIt(){
+    const sorting=this.state.items.sort(function(a,b){
+      return parseInt(a.count)<parseInt(b.count);
+    })
     this.setState({sortedItems:sorting})
   }
 
   render() {
     const data1 = [
       {
-        value: this.state.items[0].count,
-        label: this.state.items[0].name+" ("+this.state.items[0].count+")",
+        value: this.state.sortedItems[0].count,
+        label: this.state.sortedItems[0].name+" ("+this.state.sortedItems[0].count+")",
       },
       {
-        value: this.state.items[5].count,
-        label: this.state.items[5].name+" ("+this.state.items[5].count+")",
+        value: this.state.sortedItems[1].count,
+        label: this.state.sortedItems[1].name+" ("+this.state.sortedItems[1].count+")",
       },
       {
-        value: this.state.items[7].count,
-        label: this.state.items[7].name+" ("+this.state.items[7].count+")",
+        value: this.state.sortedItems[2].count,
+        label: this.state.sortedItems[2].name+" ("+this.state.sortedItems[2].count+")",
       },
       {
-        value: this.state.items[1].count,
-        label: this.state.items[1].name+" ("+this.state.items[1].count+")",
+        value: this.state.sortedItems[3].count,
+        label: this.state.sortedItems[3].name+" ("+this.state.sortedItems[3].count+")",
       },
       {
-        value: this.state.items[3].count,
-        label: this.state.items[3].name+" ("+this.state.items[3].count+")",
+        value: this.state.sortedItems[4].count,
+        label: this.state.sortedItems[4].name+" ("+this.state.sortedItems[4].count+")",
       },
     ];
     return (

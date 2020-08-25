@@ -46,12 +46,7 @@ class ReferralInfografisScreenEmergency extends React.PureComponent {
       {name:"",count:0}]
   };
 
-  countInc(n){
-    this.state.items[n].count+=1
-    this.forceUpdate()
-  }
-
-  componentDidMount(){
+  componentWillMount(){
     for(i=0;i<3000;i++){
       HealthcareAPI.get('/referral/emergency/in?id='+i).then(response => {
         for(j=0;j<response.data.length;j++){
@@ -65,13 +60,16 @@ class ReferralInfografisScreenEmergency extends React.PureComponent {
           })
           this.state.items[index].count+=1
           this.forceUpdate()
+          this.sortIt()
         }
       })
     }
-    const sorting=this.state.items
-    // .sort(function(a,b){
-    //   return parseInt(a.count)<parseInt(b.count);
-    // })
+  }
+
+  sortIt(){
+    const sorting=this.state.items.sort(function(a,b){
+      return parseInt(a.count)<parseInt(b.count);
+    })
     this.setState({sortedItems:sorting})
   }
 
