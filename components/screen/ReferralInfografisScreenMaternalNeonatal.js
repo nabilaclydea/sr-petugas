@@ -147,28 +147,6 @@ class ReferralInfografisScreenMaternalNeonatal extends React.PureComponent {
   render() {
     const data1 = [
       {
-        value: this.state.sortedItems[0].count,
-        label: this.state.sortedItems[0].name+" ("+this.state.sortedItems[0].count+")",
-      },
-      {
-        value: this.state.sortedItems[1].count,
-        label: this.state.sortedItems[1].name+" ("+this.state.sortedItems[1].count+")",
-      },
-      {
-        value: this.state.sortedItems[2].count,
-        label: this.state.sortedItems[2].name+" ("+this.state.sortedItems[2].count+")",
-      },
-      {
-        value: this.state.sortedItems[3].count,
-        label: this.state.sortedItems[3].name+" ("+this.state.sortedItems[3].count+")",
-      },
-      {
-        value: this.state.sortedItems[4].count,
-        label: this.state.sortedItems[4].name+" ("+this.state.sortedItems[4].count+")",
-      },
-    ];
-    const data2 = [
-      {
         value: this.state.sortedItems2[0].count,
         label: this.state.sortedItems2[0].name+" ("+this.state.sortedItems2[0].count+")",
       },
@@ -187,6 +165,28 @@ class ReferralInfografisScreenMaternalNeonatal extends React.PureComponent {
       {
         value: this.state.sortedItems2[4].count,
         label: this.state.sortedItems2[4].name+" ("+this.state.sortedItems2[4].count+")",
+      },
+    ];
+    const data2 = [
+      {
+        value: this.state.sortedItems[0].count,
+        label: this.state.sortedItems[0].name+" ("+this.state.sortedItems[0].count+")",
+      },
+      {
+        value: this.state.sortedItems[1].count,
+        label: this.state.sortedItems[1].name+" ("+this.state.sortedItems[1].count+")",
+      },
+      {
+        value: this.state.sortedItems[2].count,
+        label: this.state.sortedItems[2].name+" ("+this.state.sortedItems[2].count+")",
+      },
+      {
+        value: this.state.sortedItems[3].count,
+        label: this.state.sortedItems[3].name+" ("+this.state.sortedItems[3].count+")",
+      },
+      {
+        value: this.state.sortedItems[4].count,
+        label: this.state.sortedItems[4].name+" ("+this.state.sortedItems[4].count+")",
       },
     ];
     return (
