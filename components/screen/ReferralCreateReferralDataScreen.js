@@ -110,7 +110,7 @@ class ReferralCreateReferralDataScreen extends Component {
       "lingkarLenganAtas",
       "tinggiFundus",
       "letakJanin",
-      "detakJantungJanin",
+      "denyutJantungJanin",
     ],
     inputRequiredDataMaternalRead: [
       "Hamil ke",
@@ -122,10 +122,15 @@ class ReferralCreateReferralDataScreen extends Component {
     ],
     // Data tambahan untuk rujukan neonatal
     inputRequiredNeonatal: [true, true, true, true],
-    inputRequiredDataNeonatal: ["anakKe", "umur", "lingkarKepala", "imunisasi"],
+    inputRequiredDataNeonatal: [
+      "anakKe",
+      "umurAnak",
+      "lingkarKepala",
+      "imunisasi",
+    ],
     inputRequiredDataNeonatalRead: [
       "Anak ke",
-      "Umur",
+      "Umur Anak",
       "Lingkar Kepala",
       "Imunisasi",
     ],
@@ -508,7 +513,143 @@ class ReferralCreateReferralDataScreen extends Component {
     if (this.state.referralType == 3) {
       return (
         <View>
-          <Text>Maternal</Text>
+          <View style={{ marginTop: 15 }}>
+            <Text style={{ color: "#cacaca" }}>
+              Hamil ke
+              <Text style={{ color: "#f05d5e" }}> *</Text>
+            </Text>
+            <TextInput
+              keyboardType={"numeric"}
+              placeHolder={"Hamil ke"}
+              onChangeText={(text) => {
+                let tmp = this.state.referralForm;
+                tmp.rekamMedis.hamilKe = text;
+                this.setState({ referralForm: tmp });
+              }}
+              style={{
+                marginLeft: 4,
+                borderBottomColor: this.state.inputRequiredMaternal[0]
+                  ? "#c4c4c4"
+                  : "#f05d5e",
+                borderBottomWidth: 1,
+              }}
+            />
+          </View>
+
+          <View style={{ marginTop: 15 }}>
+            <Text style={{ color: "#cacaca" }}>
+              Usia Kehamilan (minggu)
+              <Text style={{ color: "#f05d5e" }}> *</Text>
+            </Text>
+            <TextInput
+              keyboardType={"numeric"}
+              placeHolder={"Umur Kehamilan"}
+              onChangeText={(text) => {
+                let tmp = this.state.referralForm;
+                tmp.rekamMedis.usiaKehamilan = text;
+                this.setState({ referralForm: tmp });
+              }}
+              style={{
+                marginLeft: 4,
+                borderBottomColor: this.state.inputRequiredMaternal[1]
+                  ? "#c4c4c4"
+                  : "#f05d5e",
+                borderBottomWidth: 1,
+              }}
+            />
+          </View>
+
+          <View style={{ marginTop: 15 }}>
+            <Text style={{ color: "#cacaca" }}>
+              Lingkar Lengan Atas (cm)
+              <Text style={{ color: "#f05d5e" }}> *</Text>
+            </Text>
+            <TextInput
+              keyboardType={"numeric"}
+              placeHolder={"Lingkar Lengan Atas"}
+              onChangeText={(text) => {
+                let tmp = this.state.referralForm;
+                tmp.rekamMedis.lingkarLenganAtas = text;
+                this.setState({ referralForm: tmp });
+              }}
+              style={{
+                marginLeft: 4,
+                borderBottomColor: this.state.inputRequiredMaternal[2]
+                  ? "#c4c4c4"
+                  : "#f05d5e",
+                borderBottomWidth: 1,
+              }}
+            />
+          </View>
+
+          <View style={{ marginTop: 15 }}>
+            <Text style={{ color: "#cacaca" }}>
+              Tinggi Fundus (cm)
+              <Text style={{ color: "#f05d5e" }}> *</Text>
+            </Text>
+            <TextInput
+              keyboardType={"numeric"}
+              placeHolder={"Tinggi Fundus"}
+              onChangeText={(text) => {
+                let tmp = this.state.referralForm;
+                tmp.rekamMedis.tinggiFundus = text;
+                this.setState({ referralForm: tmp });
+              }}
+              style={{
+                marginLeft: 4,
+                borderBottomColor: this.state.inputRequiredMaternal[3]
+                  ? "#c4c4c4"
+                  : "#f05d5e",
+                borderBottomWidth: 1,
+              }}
+            />
+          </View>
+
+          <View style={{ marginTop: 15 }}>
+            <Text style={{ color: "#cacaca" }}>
+              Letak Janin (Kep/Su/Li)
+              <Text style={{ color: "#f05d5e" }}> *</Text>
+            </Text>
+            <TextInput
+              keyboardType={"numeric"}
+              placeHolder={"Letak Janin"}
+              onChangeText={(text) => {
+                let tmp = this.state.referralForm;
+                tmp.rekamMedis.letakJanin = text;
+                this.setState({ referralForm: tmp });
+              }}
+              style={{
+                marginLeft: 4,
+                borderBottomColor: this.state.inputRequiredMaternal[4]
+                  ? "#c4c4c4"
+                  : "#f05d5e",
+                borderBottomWidth: 1,
+              }}
+            />
+          </View>
+
+          <View style={{ marginTop: 15 }}>
+            <Text style={{ color: "#cacaca" }}>
+              Denyut Jantung Janin (kali/menit)
+              <Text style={{ color: "#f05d5e" }}> *</Text>
+            </Text>
+            <TextInput
+              keyboardType={"numeric"}
+              placeHolder={"Denyut Jantung Janin"}
+              onChangeText={(text) => {
+                let tmp = this.state.referralForm;
+                tmp.rekamMedis.denyutJantungJanin = text;
+                this.setState({ referralForm: tmp });
+              }}
+              style={{
+                marginLeft: 4,
+                borderBottomColor: this.state.inputRequiredMaternal[5]
+                  ? "#c4c4c4"
+                  : "#f05d5e",
+                borderBottomWidth: 1,
+              }}
+            />
+          </View>
         </View>
       );
     }
@@ -519,7 +660,97 @@ class ReferralCreateReferralDataScreen extends Component {
     if (this.state.referralType == 4) {
       return (
         <View>
-          <Text>Neonatal</Text>
+          <View style={{ marginTop: 15 }}>
+            <Text style={{ color: "#cacaca" }}>
+              Anak ke
+              <Text style={{ color: "#f05d5e" }}> *</Text>
+            </Text>
+            <TextInput
+              keyboardType={"numeric"}
+              placeHolder={"Anak ke"}
+              onChangeText={(text) => {
+                let tmp = this.state.referralForm;
+                tmp.rekamMedis.anakKe = text;
+                this.setState({ referralForm: tmp });
+              }}
+              style={{
+                marginLeft: 4,
+                borderBottomColor: this.state.inputRequiredNeonatal[0]
+                  ? "#c4c4c4"
+                  : "#f05d5e",
+                borderBottomWidth: 1,
+              }}
+            />
+          </View>
+
+          <View style={{ marginTop: 15 }}>
+            <Text style={{ color: "#cacaca" }}>
+              Umur Anak (hari)
+              <Text style={{ color: "#f05d5e" }}> *</Text>
+            </Text>
+            <TextInput
+              keyboardType={"numeric"}
+              placeHolder={"Anak ke"}
+              onChangeText={(text) => {
+                let tmp = this.state.referralForm;
+                tmp.rekamMedis.umurAnak = text;
+                this.setState({ referralForm: tmp });
+              }}
+              style={{
+                marginLeft: 4,
+                borderBottomColor: this.state.inputRequiredNeonatal[1]
+                  ? "#c4c4c4"
+                  : "#f05d5e",
+                borderBottomWidth: 1,
+              }}
+            />
+          </View>
+
+          <View style={{ marginTop: 15 }}>
+            <Text style={{ color: "#cacaca" }}>
+              Lingkar Kepala (cm)
+              <Text style={{ color: "#f05d5e" }}> *</Text>
+            </Text>
+            <TextInput
+              keyboardType={"numeric"}
+              placeHolder={"Lingkar Kepala"}
+              onChangeText={(text) => {
+                let tmp = this.state.referralForm;
+                tmp.rekamMedis.lingkarKepala = text;
+                this.setState({ referralForm: tmp });
+              }}
+              style={{
+                marginLeft: 4,
+                borderBottomColor: this.state.inputRequiredNeonatal[2]
+                  ? "#c4c4c4"
+                  : "#f05d5e",
+                borderBottomWidth: 1,
+              }}
+            />
+          </View>
+
+          <View style={{ marginTop: 15 }}>
+            <Text style={{ color: "#cacaca" }}>
+              Imunisasi yang Telah Diberikan
+              <Text style={{ color: "#f05d5e" }}> *</Text>
+            </Text>
+            <TextInput
+              placeHolder={"Imunisasi yang Telah Diberikan"}
+              onChangeText={(text) => {
+                let tmp = this.state.referralForm;
+                tmp.rekamMedis.imunisasi = text;
+                this.setState({ referralForm: tmp });
+              }}
+              style={{
+                marginLeft: 4,
+                borderBottomColor: this.state.inputRequiredNeonatal[3]
+                  ? "#c4c4c4"
+                  : "#f05d5e",
+                borderBottomWidth: 1,
+              }}
+              multiline={true}
+            />
+          </View>
         </View>
       );
     }
@@ -579,12 +810,24 @@ class ReferralCreateReferralDataScreen extends Component {
     let inputRequiredDataEmergencyRead = this.state
       .inputRequiredDataEmergencyRead;
 
+    let inputRequiredMaternal = this.state.inputRequiredMaternal;
+    let inputRequiredDataMaternal = this.state.inputRequiredDataMaternal;
+    let inputRequiredDataMaternalRead = this.state
+      .inputRequiredDataMaternalRead;
+
+    let inputRequiredNeonatal = this.state.inputRequiredNeonatal;
+    let inputRequiredDataNeonatal = this.state.inputRequiredDataNeonatal;
+    let inputRequiredDataNeonatalRead = this.state
+      .inputRequiredDataNeonatalRead;
+
     let tmpRujukan = this.state.referralForm.rujukan;
     let tmpRekamMedis = this.state.referralForm.rekamMedis;
     let result = true;
 
     let error = [];
     let errorEmergency = [];
+    let errorMaternal = [];
+    let errorNeonatal = [];
     let errorCount = 0;
 
     console.log(tmpRujukan);
@@ -634,9 +877,47 @@ class ReferralCreateReferralDataScreen extends Component {
       });
     }
 
+    // Cek input yang dibutuhkan untuk rujuk maternal
+    if (this.state.referralType == 3) {
+      inputRequiredMaternal.map(function (input, index) {
+        let tmp = true;
+        if (!tmpRekamMedis[inputRequiredDataMaternal[index]]) {
+          tmp = false;
+          result = false;
+          errorCount = errorCount + 1;
+
+          if (errorCount <= 5) {
+            errorMaternal.push(inputRequiredDataMaternalRead[index]);
+          }
+        }
+
+        inputRequiredMaternal[index] = tmp;
+      });
+    }
+
+    // Cek input yang dibutuhkan untuk rujuk neonatal
+    if (this.state.referralType == 4) {
+      inputRequiredNeonatal.map(function (input, index) {
+        let tmp = true;
+        if (!tmpRekamMedis[inputRequiredDataNeonatal[index]]) {
+          tmp = false;
+          result = false;
+          errorCount = errorCount + 1;
+
+          if (errorCount <= 5) {
+            errorNeonatal.push(inputRequiredDataNeonatalRead[index]);
+          }
+        }
+
+        inputRequiredNeonatal[index] = tmp;
+      });
+    }
+
     this.setState({
       inputRequired: inputRequired,
       inputRequiredEmergency: inputRequiredEmergency,
+      inputRequiredMaternal: inputRequiredMaternal,
+      inputRequiredNeonatal: inputRequiredNeonatal,
     });
 
     if (result) {

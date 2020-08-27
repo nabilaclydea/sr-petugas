@@ -89,7 +89,29 @@ class HomeScreen extends Component {
                   "referralEmergencyOut",
                   JSON.stringify(response.data)
                 ),
-              this.setState({ spinner: false })
+              HealthcareAPI.get("/referral/maternal/out", {
+                params: {
+                  id: this.state.user.idFaskes,
+                },
+              }).then(
+                (response) =>
+                  AsyncStorage.setItem(
+                    "referralMaternalOut",
+                    JSON.stringify(response.data)
+                  ),
+                HealthcareAPI.get("/referral/neonatal/out", {
+                  params: {
+                    id: this.state.user.idFaskes,
+                  },
+                }).then(
+                  (response) =>
+                    AsyncStorage.setItem(
+                      "referralNeonatalOut",
+                      JSON.stringify(response.data)
+                    ),
+                  this.setState({ spinner: false })
+                )
+              )
             )
           )
         )

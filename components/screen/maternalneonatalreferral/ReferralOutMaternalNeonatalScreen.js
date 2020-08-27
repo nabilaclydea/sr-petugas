@@ -7,7 +7,7 @@ import {
   Image,
   TextInput,
   ScrollView,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Spinner from "react-native-loading-spinner-overlay";
@@ -15,7 +15,7 @@ import AsyncStorage from "@react-native-community/async-storage";
 
 class ReferralOutMaternalNeonatalScreen extends Component {
   static navigationOptions = {
-    header: null
+    header: null,
   };
   state = {
     day: ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"],
@@ -31,17 +31,17 @@ class ReferralOutMaternalNeonatalScreen extends Component {
       "September",
       "Oktober",
       "November",
-      "Desember"
+      "Desember",
     ],
     colorStatus: ["#f05d5e", "#28c667", "#000000", "#00a6fb"],
     textStatus: ["Belum Diproses", "Diterima", "Ditolak", "Rujuk Balik"],
-    referralType: 3,
+    referralType: [3, 4],
     referralDirection: 1,
     activeStatus: 1,
     isActiveStatusOptionOpen: 0,
     spinner: false,
     referrals: [],
-    search: ""
+    search: "",
   };
 
   _setStatusReferralScreen() {
@@ -52,7 +52,7 @@ class ReferralOutMaternalNeonatalScreen extends Component {
         style={{
           flexDirection: "row",
           alignItems: "center",
-          height: 100 / 3 + "%"
+          height: 100 / 3 + "%",
         }}
       >
         <View
@@ -63,7 +63,7 @@ class ReferralOutMaternalNeonatalScreen extends Component {
             alignItems: "center",
             justifyContent: "center",
             width: 100 + "%",
-            height: 40 + "%"
+            height: 40 + "%",
           }}
         >
           <Text style={{ fontSize: 12, color: "#ffffff", fontWeight: "bold" }}>
@@ -72,6 +72,172 @@ class ReferralOutMaternalNeonatalScreen extends Component {
         </View>
       </View>
     );
+  }
+
+  _setReferralsScreen() {
+    const { navigate } = this.props.navigation;
+
+    let result = this.state.referrals
+      .filter((referral) => {
+        let isStatus =
+          this.state.textStatus[this.state.activeStatus - 1] ==
+          referral.statusRujukan.namaStatusRujukan;
+        let search = this.state.search.toLowerCase();
+        if (isStatus && referral.noRujukan.toLowerCase().includes(search)) {
+          return true;
+        } else if (
+          isStatus &&
+          referral.pasien.nama.toLowerCase().includes(search)
+        ) {
+          return true;
+        } else if (
+          isStatus &&
+          referral.faskesTujuan.nama.toLowerCase().includes(search)
+        ) {
+          return true;
+        }
+        return false;
+      })
+      .map((referral) => (
+        <View key={referral.noRujukan}>
+          <TouchableOpacity
+            onPress={() => {
+              this.setState({ isActiveStatusOptionOpen: 0 });
+              navigate("ReferralDetailScreen", {
+                referral: referral,
+                activeStatus: this.state.activeStatus,
+                referralDirection: this.state.referralDirection,
+                referralType: this.state.referralType,
+              });
+            }}
+            activeOpacity={0.7}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "#ffffff",
+              width: 100 + "%",
+              height: 140,
+            }}
+          >
+            <View style={{ flexDirection: "column", marginLeft: 5 + "%" }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  height: 100 / 3 + "%",
+                }}
+              >
+                <Text style={{ fontSize: 12, color: "#002e52" }}>
+                  No. Rujukan:{" "}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: "#002e52",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {referral.noRujukan}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  height: 100 / 3 + "%",
+                }}
+              >
+                <Image
+                  style={{ width: 20, height: 20 }}
+                  source={require("../../../assets/images/injured.png")}
+                />
+                <Text
+                  style={{
+                    marginLeft: 7 + "%",
+                    fontSize: 12,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {referral.pasien.nama}
+                </Text>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  height: 100 / 3 + "%",
+                }}
+              >
+                <Image
+                  style={{ marginLeft: 3 + "%", width: 12, height: 12 }}
+                  source={require("../../../assets/images/to.png")}
+                />
+                <Text
+                  style={{
+                    marginLeft: 9 + "%",
+                    fontSize: 12,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {referral.faskesTujuan.nama}
+                </Text>
+              </View>
+            </View>
+            <View
+              style={{
+                position: "absolute",
+                flexDirection: "column",
+                height: 100 + "%",
+                right: 5 + "%",
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignSelf: "flex-end",
+                  alignItems: "center",
+                  height: 100 / 3 + "%",
+                }}
+              >
+                <Text style={{ fontSize: 12, color: "#000000" }}>
+                  {this.state.day[
+                    new Date(referral.rekamMedis.tanggalPemeriksaan).getDay()
+                  ] +
+                    ", " +
+                    new Date(referral.rekamMedis.tanggalPemeriksaan).getDate() +
+                    " " +
+                    this.state.month[
+                      new Date(
+                        referral.rekamMedis.tanggalPemeriksaan
+                      ).getMonth()
+                    ] +
+                    " " +
+                    new Date(
+                      referral.rekamMedis.tanggalPemeriksaan
+                    ).getFullYear()}
+                </Text>
+              </View>
+              {this._setStatusReferralScreen()}
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignSelf: "flex-end",
+                  alignItems: "center",
+                  height: 100 / 3 + "%",
+                }}
+              >
+                <Text style={{ fontSize: 12, color: "#c4c4c4" }}>
+                  {referral.ruangan.namaTipeRuangan}
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+          <View
+            style={{ backgroundColor: "#eeeeee", width: 100 + "%", height: 1 }}
+          />
+        </View>
+      ));
+    return result;
   }
 
   _setActiveStatusOptionOpen() {
@@ -117,7 +283,7 @@ class ReferralOutMaternalNeonatalScreen extends Component {
           alignItems: "center",
           backgroundColor: this.state.colorStatus[index],
           width: 25 + "%",
-          height: 100 + "%"
+          height: 100 + "%",
         }}
       >
         <Text style={{ color: "#ffffff", fontSize: 10, fontWeight: "bold" }}>
@@ -132,7 +298,7 @@ class ReferralOutMaternalNeonatalScreen extends Component {
   _setActiveStatus(newActiveStatus) {
     this.setState({
       activeStatus: newActiveStatus,
-      isActiveStatusOptionOpen: 0
+      isActiveStatusOptionOpen: 0,
     });
   }
 
@@ -144,7 +310,7 @@ class ReferralOutMaternalNeonatalScreen extends Component {
         style={{
           color: this.state.colorStatus[activeStatus],
           fontSize: 12,
-          fontWeight: "bold"
+          fontWeight: "bold",
         }}
       >
         {this.state.textStatus[activeStatus]}
@@ -156,7 +322,12 @@ class ReferralOutMaternalNeonatalScreen extends Component {
 
   componentDidMount() {
     this.listener = this.props.navigation.addListener("willFocus", () => {
-      AsyncStorage.getItem("referralEmergencyIn").then(result =>
+      AsyncStorage.getItem("referralMaternalOut").then((result) =>
+        this.setState({ referrals: JSON.parse(result) })
+      );
+    });
+    this.listener = this.props.navigation.addListener("willFocus", () => {
+      AsyncStorage.getItem("referralNeonatalOut").then((result) =>
         this.setState({ referrals: JSON.parse(result) })
       );
     });
@@ -167,15 +338,8 @@ class ReferralOutMaternalNeonatalScreen extends Component {
   }
 
   render() {
-    const { navigate } = this.props.navigation;
     return (
       <View style={styles.firstLayer}>
-        <Spinner
-          animation={"slide"}
-          visible={this.state.spinner}
-          textContent={"Memuat Data Rujukan..."}
-          textStyle={{ color: "#ffffff" }}
-        />
         <StatusBar backgroundColor={"#00818c"} />
         <View
           style={{
@@ -183,7 +347,7 @@ class ReferralOutMaternalNeonatalScreen extends Component {
             alignItems: "center",
             backgroundColor: "#ffffff",
             width: 100 + "%",
-            height: 45
+            height: 45,
           }}
         >
           <Image
@@ -191,14 +355,14 @@ class ReferralOutMaternalNeonatalScreen extends Component {
             source={require("../../../assets/images/magnifier.png")}
           />
           <TextInput
-            onChangeText={search => this.setState({ search })}
+            onChangeText={(search) => this.setState({ search })}
             placeholder={"Cari Pasien atau Faskes"}
             placeholderTextColor={"#aeaeae"}
             style={{ marginLeft: 5 + "%", width: 45 + "%" }}
           />
           <View
             style={{ backgroundColor: "#aeaeae", width: 1, height: 60 + "%" }}
-          ></View>
+          />
           <TouchableOpacity
             style={{ flexDirection: "row", width: 100 + "%" }}
             onPress={() => this._setActiveStatusOptionOpen()}
@@ -207,7 +371,7 @@ class ReferralOutMaternalNeonatalScreen extends Component {
               style={{
                 alignItems: "center",
                 justifyContent: "center",
-                width: 30 + "%"
+                width: 30 + "%",
               }}
             >
               {this._setActiveStatusScreen()}
@@ -216,7 +380,7 @@ class ReferralOutMaternalNeonatalScreen extends Component {
               style={{
                 justifyContent: "flex-end",
                 alignItems: "center",
-                right: 10 + "%"
+                right: 10 + "%",
               }}
             >
               {this._setArrowImageScreen()}
@@ -227,249 +391,7 @@ class ReferralOutMaternalNeonatalScreen extends Component {
         {this._setActiveStatusOptionScreen()}
 
         <ScrollView style={{ marginTop: 5 + "%" }}>
-          <TouchableOpacity
-            onPress={() => {
-              this.setState({ isActiveStatusOptionOpen: 0 });
-              navigate("MaternalReferralDetailScreen", {
-                //referral: referral,
-                activeStatus: this.state.activeStatus,
-                referralDirection: this.state.referralDirection,
-                referralType: this.state.referralType
-              });
-            }}
-            activeOpacity={0.7}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "#ffffff",
-              width: 100 + "%",
-              height: 140
-            }}
-          >
-            <View style={{ flexDirection: "column", marginLeft: 5 + "%" }}>
-              {/* No Rujukan */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  height: 100 / 3 + "%"
-                }}
-              >
-                <Text style={{ fontSize: 12, color: "#002e52" }}>
-                  No. Rujukan:{" "}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: "#002e52",
-                    fontWeight: "bold"
-                  }}
-                >
-                  1
-                </Text>
-              </View>
-              {/* Nama Pasien */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  height: 100 / 3 + "%"
-                }}
-              >
-                <Image
-                  style={{ width: 20, height: 20 }}
-                  source={require("../../../assets/images/injured.png")}
-                />
-                <Text
-                  style={{
-                    marginLeft: 7 + "%",
-                    fontSize: 12,
-                    fontWeight: "bold"
-                  }}
-                >
-                  Maria Lestari
-                </Text>
-              </View>
-              {/* Fasilitas Kesehatan */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  height: 100 / 3 + "%"
-                }}
-              >
-                <Image
-                  style={{ marginLeft: 3 + "%", width: 12, height: 12 }}
-                  source={require("../../../assets/images/from.png")}
-                />
-                <Text
-                  style={{
-                    marginLeft: 9 + "%",
-                    fontSize: 12,
-                    fontWeight: "bold"
-                  }}
-                >
-                  Puskesmas Pondok Benda
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                position: "absolute",
-                flexDirection: "column",
-                height: 100 + "%",
-                right: 5 + "%"
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignSelf: "flex-end",
-                  alignItems: "center",
-                  height: 100 / 3 + "%"
-                }}
-              >
-                <Text style={{ fontSize: 12, color: "#000000" }}>
-                  Kamis, 5 Desember 2019
-                </Text>
-              </View>
-              {this._setStatusReferralScreen()}
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignSelf: "flex-end",
-                  alignItems: "center",
-                  height: 100 / 3 + "%"
-                }}
-              >
-                <Text style={{ fontSize: 12, color: "#c4c4c4" }}>ICU</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-          <View
-            style={{ backgroundColor: "#eeeeee", width: 100 + "%", height: 1 }}
-          />
-          <TouchableOpacity
-            onPress={() => {
-              this.setState({ isActiveStatusOptionOpen: 0 });
-              navigate("NeonatalReferralDetailScreen", {
-                //referral: referral,
-                activeStatus: this.state.activeStatus,
-                referralDirection: this.state.referralDirection,
-                referralType: this.state.referralType
-              });
-            }}
-            activeOpacity={0.7}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: "#ffffff",
-              width: 100 + "%",
-              height: 140
-            }}
-          >
-            <View style={{ flexDirection: "column", marginLeft: 5 + "%" }}>
-              {/* No Rujukan */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  height: 100 / 3 + "%"
-                }}
-              >
-                <Text style={{ fontSize: 12, color: "#002e52" }}>
-                  No. Rujukan:{" "}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: "#002e52",
-                    fontWeight: "bold"
-                  }}
-                >
-                  2
-                </Text>
-              </View>
-              {/* Nama Pasien */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  height: 100 / 3 + "%"
-                }}
-              >
-                <Image
-                  style={{ width: 20, height: 20 }}
-                  source={require("../../../assets/images/injured.png")}
-                />
-                <Text
-                  style={{
-                    marginLeft: 7 + "%",
-                    fontSize: 12,
-                    fontWeight: "bold"
-                  }}
-                >
-                  Indah Wijayanti
-                </Text>
-              </View>
-              {/* Fasilitas Kesehatan */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  height: 100 / 3 + "%"
-                }}
-              >
-                <Image
-                  style={{ marginLeft: 3 + "%", width: 12, height: 12 }}
-                  source={require("../../../assets/images/from.png")}
-                />
-                <Text
-                  style={{
-                    marginLeft: 9 + "%",
-                    fontSize: 12,
-                    fontWeight: "bold"
-                  }}
-                >
-                  Puskesmas Pamulang
-                </Text>
-              </View>
-            </View>
-
-            <View
-              style={{
-                position: "absolute",
-                flexDirection: "column",
-                height: 100 + "%",
-                right: 5 + "%"
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignSelf: "flex-end",
-                  alignItems: "center",
-                  height: 100 / 3 + "%"
-                }}
-              >
-                <Text style={{ fontSize: 12, color: "#000000" }}>
-                  Jumat, 6 Desember 2019
-                </Text>
-              </View>
-              {this._setStatusReferralScreen()}
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignSelf: "flex-end",
-                  alignItems: "center",
-                  height: 100 / 3 + "%"
-                }}
-              >
-                <Text style={{ fontSize: 12, color: "#c4c4c4" }}>NICU</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
+          {this._setReferralsScreen()}
         </ScrollView>
       </View>
     );
@@ -480,8 +402,8 @@ const styles = StyleSheet.create({
   firstLayer: {
     width: 100 + "%",
     height: 100 + "%",
-    backgroundColor: "#f2f5f7"
-  }
+    backgroundColor: "#f2f5f7",
+  },
 });
 
 export default ReferralOutMaternalNeonatalScreen;

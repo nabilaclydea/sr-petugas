@@ -56,7 +56,7 @@ class ReferralCreatePatientDataScreen extends Component {
     isPatientNotFoundSelected: false,
     required: {},
     inputRequired: [true, true, true, true],
-    inputRequiredData: ["name", "noHandphone", "alamat", "kodePos"],
+    inputRequiredData: ["nama", "noHandphone", "alamat", "kodePos"],
     inputRequiredDataRead: [
       "Nama",
       "Nomor Telepon Pribadi",
@@ -120,10 +120,18 @@ class ReferralCreatePatientDataScreen extends Component {
     HealthcareAPI.get(url).then((response) => {
       let tmp = response.data;
       if (this.state.referralType <= 1) {
-        tmp.rujukan.isRujukEmergency = 0;
+        tmp.rujukan.tipeRujukan = 0;
+        //   // } else if (this.state.referralType <= 2) {
+        //   //   tmp.rujukan.tipeRujukan = 1;
+        //   // } else if (this.state.referralType <= 3) {
+        //   //   tmp.rujukan.tipeRujukan = 2;
+        //   // } else {
+        //   //   tmp.rujukan.tipeRujukan = 3;
+        //   // }
       } else {
-        tmp.rujukan.isRujukEmergency = 1;
+        tmp.rujukan.tipeRujukan = 1;
       }
+      // tmp.rujukan.tipeRujukan = this.state.referralType - 1;
       this.setState({ referralForm: tmp });
     });
   }

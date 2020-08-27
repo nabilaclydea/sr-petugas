@@ -302,6 +302,8 @@ class ReferralCreateICD10Screen extends Component {
                       this.setState({ visibleModal: false, spinner: true });
                       let poli = null;
                       let emergency = null;
+                      // let maternal = null;
+                      // let neonatal = null;
                       let form = this.props.navigation.getParam("referralForm");
                       let docPemeriksaanDarah = this.props.navigation.getParam(
                         "docPemeriksaanDarah"
@@ -315,9 +317,19 @@ class ReferralCreateICD10Screen extends Component {
                       } else {
                         emergency = form;
                       }
+                      // if (this.state.referralType <= 2) {
+                      //   emergency = form;
+                      // }
+                      // if (this.state.referralType <= 3) {
+                      //   maternal = form;
+                      // } else {
+                      //   neonatal = form;
+                      // }
                       HealthcareAPI.post("/referral/create", {
                         referralPoliForm: poli,
                         referralEmergencyForm: emergency,
+                        // referralMaternalForm: maternal,
+                        // referralNeonatalForm: neonatal,
                         icd9: this.props.navigation.getParam("icd9"),
                         icd10: this.state.selectedICD10,
                       })
