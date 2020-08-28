@@ -6,7 +6,9 @@ import ReferralOutEmergencyStack from "./ReferralOutEmergencyStack";
 import ProfileStack from "./ProfileStack";
 import ReferralInMaternalNeonatalStack from "./ReferralInMaternalNeonatalStack";
 import ReferralOutMaternalNeonatalStack from "./ReferralOutMaternalNeonatalStack";
-import InfografisStack from "./InfografisStack";
+import InfografisStackPoli from "./InfografisStackPoli";
+import InfografisStackEmergency from "./InfografisStackEmergency";
+import InfografisStackMaternalNeonatal from "./InfografisStackMaternalNeonatal";
 
 export {
   HomeStack,
@@ -17,5 +19,7 @@ export {
   ProfileStack,
   ReferralInMaternalNeonatalStack,
   ReferralOutMaternalNeonatalStack,
-  InfografisStack
+  InfografisStackPoli,
+  InfografisStackEmergency,
+  InfografisStackMaternalNeonatal
 };
