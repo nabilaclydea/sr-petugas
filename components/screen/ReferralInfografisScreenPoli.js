@@ -154,9 +154,6 @@ class ReferralInfografisScreenPoli extends React.PureComponent {
           this.state.items[index].count+=1
           this.forceUpdate()
           this.sortIt()
-          this.sortItOut()
-          this.sortItIn()
-          this.sortItDiagnosis()
         }
       })
     }
@@ -166,25 +163,19 @@ class ReferralInfografisScreenPoli extends React.PureComponent {
     const sorting=this.state.items.sort(function(a,b){
       return parseInt(a.count)<parseInt(b.count);
     })
-    this.setState({sortedItems:sorting})
-  }
-  sortItOut(){
-    const sorting=this.state.itemsOut.sort(function(a,b){
+
+    const sortingOut=this.state.itemsOut.sort(function(a,b){
       return parseInt(a.count)<parseInt(b.count);
     })
-    this.setState({sortedItemsOut:sorting})
-  }
-  sortItIn(){
-    const sorting=this.state.itemsIn.sort(function(a,b){
+    
+    const sortingIn=this.state.itemsIn.sort(function(a,b){
       return parseInt(a.count)<parseInt(b.count);
     })
-    this.setState({sortedItemsIn:sorting})
-  }
-  sortItDiagnosis(){
-    const sorting=this.state.diagnosisItems.sort(function(a,b){
+    
+    const sortingDiagnosis=this.state.diagnosisItems.sort(function(a,b){
       return parseInt(a.count)<parseInt(b.count);
     })
-    this.setState({sortedDiagnosisItems:sorting})
+    this.setState({sortedItems:sorting, sortedItemsOut:sortingOut, sortedItemsIn:sortingIn, sortedDiagnosisItems:sortingDiagnosis})
   }
 
   render() {

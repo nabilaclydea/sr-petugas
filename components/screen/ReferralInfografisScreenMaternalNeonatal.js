@@ -117,8 +117,6 @@ class ReferralInfografisScreenMaternalNeonatal extends React.PureComponent {
               this.setState({diagnosisItems:this.state.diagnosisItems.concat(addToItems)})
             }
             this.sortIt()
-            this.sortIt2()
-            this.sortItDiagnosis()
           }
         })
       }
@@ -126,22 +124,18 @@ class ReferralInfografisScreenMaternalNeonatal extends React.PureComponent {
   }
 
   sortIt(){
-    const sorting=this.state.items.sort(function(a,b){
+    const sortingOut=this.state.items.sort(function(a,b){
       return parseInt(a.count)<parseInt(b.count);
     })
-    this.setState({sortedItems:sorting})
-  }
-  sortIt2(){
-    const sorting=this.state.items2.sort(function(a,b){
+    
+    const sortingIn=this.state.items2.sort(function(a,b){
       return parseInt(a.count)<parseInt(b.count);
     })
-    this.setState({sortedItems2:sorting})
-  }
-  sortItDiagnosis(){
-    const sorting=this.state.diagnosisItems.sort(function(a,b){
+    
+    const sortingDiagnosis=this.state.diagnosisItems.sort(function(a,b){
       return parseInt(a.count)<parseInt(b.count);
     })
-    this.setState({sortedDiagnosisItems:sorting})
+    this.setState({sortedItems:sortingOut, sortedItems2:sortingIn, sortedDiagnosisItems:sortingDiagnosis})
   }
 
   render() {
