@@ -317,10 +317,11 @@ class ReferralCreateICD10Screen extends Component {
                       } else {
                         emergency = form;
                       }
-                      // if (this.state.referralType <= 2) {
+                      // if (this.state.referralType <= 1) {
+                      //   poli = form;
+                      // } else if (this.state.referralType <= 2) {
                       //   emergency = form;
-                      // }
-                      // if (this.state.referralType <= 3) {
+                      // } else if (this.state.referralType <= 3) {
                       //   maternal = form;
                       // } else {
                       //   neonatal = form;

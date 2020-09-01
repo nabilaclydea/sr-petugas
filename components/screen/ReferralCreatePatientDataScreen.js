@@ -119,19 +119,12 @@ class ReferralCreatePatientDataScreen extends Component {
     }
     HealthcareAPI.get(url).then((response) => {
       let tmp = response.data;
-      if (this.state.referralType <= 1) {
-        tmp.rujukan.tipeRujukan = 0;
-        //   // } else if (this.state.referralType <= 2) {
-        //   //   tmp.rujukan.tipeRujukan = 1;
-        //   // } else if (this.state.referralType <= 3) {
-        //   //   tmp.rujukan.tipeRujukan = 2;
-        //   // } else {
-        //   //   tmp.rujukan.tipeRujukan = 3;
-        //   // }
-      } else {
-        tmp.rujukan.tipeRujukan = 1;
-      }
-      // tmp.rujukan.tipeRujukan = this.state.referralType - 1;
+      // if (this.state.referralType <= 1) {
+      //   tmp.rujukan.tipeRujukan = 0;
+      // } else {
+      //   tmp.rujukan.tipeRujukan = 1;
+      // }
+      tmp.rujukan.tipeRujukan = this.state.referralType - 1;
       this.setState({ referralForm: tmp });
     });
   }

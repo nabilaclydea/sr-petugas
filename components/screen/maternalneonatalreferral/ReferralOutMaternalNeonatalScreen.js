@@ -321,15 +321,26 @@ class ReferralOutMaternalNeonatalScreen extends Component {
   listener = null;
 
   componentDidMount() {
+    let temp_maternal = [];
+    let temp_neonatal = [];
     this.listener = this.props.navigation.addListener("willFocus", () => {
-      AsyncStorage.getItem("referralMaternalOut").then((result) =>
-        this.setState({ referrals: JSON.parse(result) })
-      );
-    });
-    this.listener = this.props.navigation.addListener("willFocus", () => {
-      AsyncStorage.getItem("referralNeonatalOut").then((result) =>
-        this.setState({ referrals: JSON.parse(result) })
-      );
+      AsyncStorage.getItem("referralMaternalOut")
+        .then((result) => {
+          temp_maternal = JSON.parse(result);
+        })
+        .then(
+          AsyncStorage.getItem("referralNeonatalOut").then((result) => {
+            temp_neonatal = JSON.parse(result);
+            let temp_neonatal_maternal = temp_maternal.concat(temp_neonatal);
+            temp_neonatal_maternal.sort(function (a, b) {
+              return (
+                new Date(a.tanggalPasienDirujuk) -
+                new Date(b.tanggalPasienDirujuk)
+              );
+            });
+            this.setState({ referrals: temp_neonatal_maternal });
+          })
+        );
     });
   }
 
