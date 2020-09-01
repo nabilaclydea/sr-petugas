@@ -23,7 +23,9 @@ import ReferralDetailScreen from "./ReferralDetailScreen";
 import ProfileScreen from "./ProfileScreen";
 import ProfileEditScreen from "./ProfileEditScreen";
 
-import ReferralInfografisScreen from "./ReferralInfografisScreen";
+import ReferralInfografisScreenPoli from "./ReferralInfografisScreenPoli";
+import ReferralInfografisScreenEmergency from "./ReferralInfografisScreenEmergency";
+import ReferralInfografisScreenMaternalNeonatal from "./ReferralInfografisScreenMaternalNeonatal";
 
 export {
   AuthScreen,
@@ -45,5 +47,7 @@ export {
   ReferralDetailScreen,
   ProfileScreen,
   ProfileEditScreen,
-  ReferralInfografisScreen
+  ReferralInfografisScreenPoli,
+  ReferralInfografisScreenEmergency,
+  ReferralInfografisScreenMaternalNeonatal
 };
