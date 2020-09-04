@@ -119,11 +119,6 @@ class ReferralCreatePatientDataScreen extends Component {
     }
     HealthcareAPI.get(url).then((response) => {
       let tmp = response.data;
-      // if (this.state.referralType <= 1) {
-      //   tmp.rujukan.tipeRujukan = 0;
-      // } else {
-      //   tmp.rujukan.tipeRujukan = 1;
-      // }
       tmp.rujukan.tipeRujukan = this.state.referralType - 1;
       this.setState({ referralForm: tmp });
     });

@@ -461,7 +461,7 @@ class ReferralCreateScheduleDestinationScreen extends Component {
               <View style={{ marginTop: 15 }}>
                 <Text style={{ color: "#cacaca" }}>Penunjang</Text>
                 <View style={{ marginTop: 5 }}>
-                  <View styl={{ marginLeft: 4 }}>
+                  <View style={{ marginLeft: 4 }}>
                     <MultiSelect
                       hideTags
                       items={this.state.items}

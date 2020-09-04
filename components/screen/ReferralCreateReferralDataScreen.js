@@ -12,6 +12,7 @@ import {
   StatusBar,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import MultiSelect from "react-native-multiple-select";
 import {
   DocumentPicker,
   DocumentPickerUtil,
@@ -79,6 +80,13 @@ class ReferralCreateReferralDataScreen extends Component {
       "#f05d5e",
     ],
     selectedSeverity: 6,
+    selectedImmunization: [],
+    immunizations: [
+      { id: "1", name: "Hepatitis B" },
+      { id: "2", name: "Polio" },
+      { id: "3", name: "BCG" },
+      { id: "4", name: "DPT" },
+    ],
     file: "",
     inputRequired: [true, true, true, true, true, true, true],
     inputRequiredData: [
@@ -121,18 +129,18 @@ class ReferralCreateReferralDataScreen extends Component {
       "Detak Jantung Janin",
     ],
     // Data tambahan untuk rujukan neonatal
-    inputRequiredNeonatal: [true, true, true, true],
+    inputRequiredNeonatal: [true, true, true],
     inputRequiredDataNeonatal: [
       "anakKe",
       "umurAnak",
       "lingkarKepala",
-      "imunisasi",
+      // "imunisasi",
     ],
     inputRequiredDataNeonatalRead: [
       "Anak ke",
       "Umur Anak",
       "Lingkar Kepala",
-      "Imunisasi",
+      // "Imunisasi",
     ],
     healthPersonnels: [],
     transportations: [],
@@ -447,62 +455,6 @@ class ReferralCreateReferralDataScreen extends Component {
               </Picker>
             </View>
           </View>
-
-          <View style={{ marginTop: 15 }}>
-            <Text style={{ color: "#cacaca" }}>
-              Suhu Tubuh (Celsius)
-              <Text style={{ color: "#f05d5e" }}> *</Text>
-            </Text>
-            <TextInput
-              keyboardType={"numeric"}
-              placeHolder={"Suhu Tubuh"}
-              onChangeText={(text) => {
-                let tmp = this.state.referralForm;
-                tmp.rekamMedis.suhuTubuh = text;
-                this.setState({ referralForm: tmp });
-              }}
-              style={{
-                marginLeft: 4,
-                borderBottomColor: this.state.inputRequiredEmergency[0]
-                  ? "#c4c4c4"
-                  : "#f05d5e",
-                borderBottomWidth: 1,
-              }}
-            />
-            {!this.state.inputRequiredEmergency[0] && (
-              <Text style={{ color: "#f05d5e", fontSize: 12, marginLeft: 4 }}>
-                Masukkan suhu tubuh pasien
-              </Text>
-            )}
-          </View>
-
-          <View style={{ marginTop: 15 }}>
-            <Text style={{ color: "#cacaca" }}>
-              Laju Pernapasan (kali/menit)
-              <Text style={{ color: "#f05d5e" }}> *</Text>
-            </Text>
-            <TextInput
-              keyboardType={"numeric"}
-              placeHolder={"Laju Pernapasan"}
-              onChangeText={(text) => {
-                let tmp = this.state.referralForm;
-                tmp.rekamMedis.respirartoryRate = text;
-                this.setState({ referralForm: tmp });
-              }}
-              style={{
-                marginLeft: 4,
-                borderBottomColor: this.state.inputRequiredEmergency[1]
-                  ? "#c4c4c4"
-                  : "#f05d5e",
-                borderBottomWidth: 1,
-              }}
-            />
-            {!this.state.inputRequiredEmergency[1] && (
-              <Text style={{ color: "#f05d5e", fontSize: 12, marginLeft: 4 }}>
-                Masukkan laju pernapasan pasien
-              </Text>
-            )}
-          </View>
         </View>
       );
     }
@@ -534,6 +486,17 @@ class ReferralCreateReferralDataScreen extends Component {
                 borderBottomWidth: 1,
               }}
             />
+            {!this.state.inputRequiredMaternal[0] && (
+              <Text
+                style={{
+                  color: "#f05d5e",
+                  fontSize: 12,
+                  marginLeft: 4,
+                }}
+              >
+                Masukkan urutan kehamilan pasien
+              </Text>
+            )}
           </View>
 
           <View style={{ marginTop: 15 }}>
@@ -557,6 +520,17 @@ class ReferralCreateReferralDataScreen extends Component {
                 borderBottomWidth: 1,
               }}
             />
+            {!this.state.inputRequiredMaternal[1] && (
+              <Text
+                style={{
+                  color: "#f05d5e",
+                  fontSize: 12,
+                  marginLeft: 4,
+                }}
+              >
+                Masukkan usia kehamilan pasien
+              </Text>
+            )}
           </View>
 
           <View style={{ marginTop: 15 }}>
@@ -580,6 +554,17 @@ class ReferralCreateReferralDataScreen extends Component {
                 borderBottomWidth: 1,
               }}
             />
+            {!this.state.inputRequiredMaternal[2] && (
+              <Text
+                style={{
+                  color: "#f05d5e",
+                  fontSize: 12,
+                  marginLeft: 4,
+                }}
+              >
+                Masukkan denyut lingkar lengan atas pasien
+              </Text>
+            )}
           </View>
 
           <View style={{ marginTop: 15 }}>
@@ -603,6 +588,17 @@ class ReferralCreateReferralDataScreen extends Component {
                 borderBottomWidth: 1,
               }}
             />
+            {!this.state.inputRequiredMaternal[3] && (
+              <Text
+                style={{
+                  color: "#f05d5e",
+                  fontSize: 12,
+                  marginLeft: 4,
+                }}
+              >
+                Masukkan denyut tinggi fundus pasien
+              </Text>
+            )}
           </View>
 
           <View style={{ marginTop: 15 }}>
@@ -626,6 +622,17 @@ class ReferralCreateReferralDataScreen extends Component {
                 borderBottomWidth: 1,
               }}
             />
+            {!this.state.inputRequiredMaternal[4] && (
+              <Text
+                style={{
+                  color: "#f05d5e",
+                  fontSize: 12,
+                  marginLeft: 4,
+                }}
+              >
+                Masukkan denyut letak janin pasien
+              </Text>
+            )}
           </View>
 
           <View style={{ marginTop: 15 }}>
@@ -649,6 +656,17 @@ class ReferralCreateReferralDataScreen extends Component {
                 borderBottomWidth: 1,
               }}
             />
+            {!this.state.inputRequiredMaternal[5] && (
+              <Text
+                style={{
+                  color: "#f05d5e",
+                  fontSize: 12,
+                  marginLeft: 4,
+                }}
+              >
+                Masukkan denyut jantung janin pasien
+              </Text>
+            )}
           </View>
         </View>
       );
@@ -681,6 +699,17 @@ class ReferralCreateReferralDataScreen extends Component {
                 borderBottomWidth: 1,
               }}
             />
+            {!this.state.inputRequiredNeonatal[0] && (
+              <Text
+                style={{
+                  color: "#f05d5e",
+                  fontSize: 12,
+                  marginLeft: 4,
+                }}
+              >
+                Masukkan urutan anak pasien
+              </Text>
+            )}
           </View>
 
           <View style={{ marginTop: 15 }}>
@@ -704,6 +733,17 @@ class ReferralCreateReferralDataScreen extends Component {
                 borderBottomWidth: 1,
               }}
             />
+            {!this.state.inputRequiredNeonatal[1] && (
+              <Text
+                style={{
+                  color: "#f05d5e",
+                  fontSize: 12,
+                  marginLeft: 4,
+                }}
+              >
+                Masukkan umur anak
+              </Text>
+            )}
           </View>
 
           <View style={{ marginTop: 15 }}>
@@ -727,6 +767,17 @@ class ReferralCreateReferralDataScreen extends Component {
                 borderBottomWidth: 1,
               }}
             />
+            {!this.state.inputRequiredNeonatal[2] && (
+              <Text
+                style={{
+                  color: "#f05d5e",
+                  fontSize: 12,
+                  marginLeft: 4,
+                }}
+              >
+                Masukkan lingkar kepala pasien
+              </Text>
+            )}
           </View>
 
           <View style={{ marginTop: 15 }}>
@@ -734,7 +785,7 @@ class ReferralCreateReferralDataScreen extends Component {
               Imunisasi yang Telah Diberikan
               <Text style={{ color: "#f05d5e" }}> *</Text>
             </Text>
-            <TextInput
+            {/* <TextInput
               placeHolder={"Imunisasi yang Telah Diberikan"}
               onChangeText={(text) => {
                 let tmp = this.state.referralForm;
@@ -749,11 +800,138 @@ class ReferralCreateReferralDataScreen extends Component {
                 borderBottomWidth: 1,
               }}
               multiline={true}
-            />
+            /> */}
+            <View style={{ marginTop: 5 }}>
+              <View style={{ marginLeft: 4 }}>
+                <MultiSelect
+                  hideTags
+                  items={this.state.immunizations}
+                  uniqueKey="id"
+                  ref={(component) => {
+                    this.multiSelect = component;
+                  }}
+                  onSelectedItemsChange={(selectedImmunization) =>
+                    this._onSelectedImmunizations(selectedImmunization)
+                  }
+                  selectedItems={this.state.selectedImmunization}
+                  selectText="Pilih Imunisasi"
+                  searchInputPlaceholderText="Cari Imunisasi..."
+                  onChangeInput={(text) => console.log(text)}
+                  tagRemoveIconColor="#f05d5e"
+                  tagBorderColor="#00818c"
+                  tagTextColor="#000000"
+                  selectedItemTextColor="#00818c"
+                  selectedItemIconColor="#00818c"
+                  itemTextColor="#000"
+                  displayKey="name"
+                  searchInputStyle={{ color: "#c4c4c4" }}
+                  styleDropdownMenuSubsection={{ color: "red" }}
+                  submitButtonColor="#00818c"
+                  submitButtonText="Pilih"
+                />
+              </View>
+              <View>
+                {this.multiSelect &&
+                  this.multiSelect.getSelectedItemsExt(
+                    this.state.selectedImmunization
+                  )}
+              </View>
+            </View>
+            {/* {!this.state.inputRequiredNeonatal[3] && (
+              <Text
+                style={{
+                  color: "#f05d5e",
+                  fontSize: 12,
+                  marginLeft: 4,
+                }}
+              >
+                Masukkan imunisasi pasien
+              </Text>
+            )} */}
           </View>
         </View>
       );
     }
+  }
+
+  _setRequiredScreen() {
+    if (this.state.referralType >= 2) {
+      return (
+        <View>
+          <View style={{ marginTop: 15 }}>
+            <Text style={{ color: "#cacaca" }}>
+              Suhu Tubuh (Celsius)
+              <Text style={{ color: "#f05d5e" }}> *</Text>
+            </Text>
+            <TextInput
+              keyboardType={"numeric"}
+              placeHolder={"Suhu Tubuh"}
+              onChangeText={(text) => {
+                let tmp = this.state.referralForm;
+                tmp.rekamMedis.suhuTubuh = text;
+                this.setState({ referralForm: tmp });
+              }}
+              style={{
+                marginLeft: 4,
+                borderBottomColor: this.state.inputRequiredEmergency[0]
+                  ? "#c4c4c4"
+                  : "#f05d5e",
+                borderBottomWidth: 1,
+              }}
+            />
+            {!this.state.inputRequiredEmergency[0] && (
+              <Text
+                style={{
+                  color: "#f05d5e",
+                  fontSize: 12,
+                  marginLeft: 4,
+                }}
+              >
+                Masukkan suhu tubuh pasien
+              </Text>
+            )}
+          </View>
+
+          <View style={{ marginTop: 15 }}>
+            <Text style={{ color: "#cacaca" }}>
+              Laju Pernapasan (kali/menit)
+              <Text style={{ color: "#f05d5e" }}> *</Text>
+            </Text>
+            <TextInput
+              keyboardType={"numeric"}
+              placeHolder={"Laju Pernapasan"}
+              onChangeText={(text) => {
+                let tmp = this.state.referralForm;
+                tmp.rekamMedis.respirartoryRate = text;
+                this.setState({ referralForm: tmp });
+              }}
+              style={{
+                marginLeft: 4,
+                borderBottomColor: this.state.inputRequiredEmergency[1]
+                  ? "#c4c4c4"
+                  : "#f05d5e",
+                borderBottomWidth: 1,
+              }}
+            />
+            {!this.state.inputRequiredEmergency[1] && (
+              <Text
+                style={{
+                  color: "#f05d5e",
+                  fontSize: 12,
+                  marginLeft: 4,
+                }}
+              >
+                Masukkan laju pernapasan pasien
+              </Text>
+            )}
+          </View>
+        </View>
+      );
+    }
+  }
+
+  _onSelectedImmunizations(selectedImmunization) {
+    this.setState({ selectedImmunization: selectedImmunization });
   }
 
   _uploadFile1() {
@@ -860,7 +1038,7 @@ class ReferralCreateReferralDataScreen extends Component {
     });
 
     // Cek input yang dibutuhkan untuk rujuk emergency
-    if (this.state.referralType == 2) {
+    if (this.state.referralType >= 2) {
       inputRequiredEmergency.map(function (input, index) {
         let tmp = true;
         if (!tmpRekamMedis[inputRequiredDataEmergency[index]]) {
@@ -935,7 +1113,11 @@ class ReferralCreateReferralDataScreen extends Component {
 
       if (errorCount <= 5) {
         message =
-          error.join(", ") + errorEmergency.join(", ") + " belum terisi.";
+          error.join(", ") +
+          errorEmergency.join(", ") +
+          errorMaternal.join(", ") +
+          errorNeonatal.join(", ") +
+          " belum terisi.";
       }
 
       Alert.alert("Validasi Gagal", message);
@@ -1108,6 +1290,7 @@ class ReferralCreateReferralDataScreen extends Component {
               {this._setEmergencyScreen()}
               {this._setMaternalScreen()}
               {this._setNeonatalScreen()}
+              {this._setRequiredScreen()}
 
               <View
                 style={{ marginTop: this.state.referralType <= 1 ? 0 : 15 }}
@@ -1140,7 +1323,6 @@ class ReferralCreateReferralDataScreen extends Component {
                   </Text>
                 )}
               </View>
-
               <View style={{ marginTop: 15 }}>
                 <Text style={{ color: "#cacaca" }}>
                   Tekanan Darah (mmHg)
@@ -1206,7 +1388,6 @@ class ReferralCreateReferralDataScreen extends Component {
                   </Text>
                 )}
               </View>
-
               <View style={{ marginTop: 15 }}>
                 <Text style={{ color: "#cacaca" }}>
                   Berat Badan (kg)
@@ -1236,7 +1417,6 @@ class ReferralCreateReferralDataScreen extends Component {
                   </Text>
                 )}
               </View>
-
               <View style={{ marginTop: 15 }}>
                 <Text style={{ color: "#cacaca" }}>
                   Tinggi Badan (cm)
@@ -1266,7 +1446,6 @@ class ReferralCreateReferralDataScreen extends Component {
                   </Text>
                 )}
               </View>
-
               <View style={{ marginTop: 15 }}>
                 <Text style={{ color: "#cacaca" }}>Keterangan Lain</Text>
                 <TextInput

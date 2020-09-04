@@ -10,6 +10,7 @@ import {
   StyleSheet,
   StatusBar,
 } from "react-native";
+import AsyncStorage from "@react-native-community/async-storage";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { StackActions, NavigationActions } from "react-navigation";
 
@@ -76,20 +77,24 @@ class ReferralCreateFinish extends Component {
           >
             <TouchableOpacity
               onPress={() => {
-                const resetAction = StackActions.reset({
-                  index: 1,
-                  actions: [
-                    NavigationActions.navigate({ routeName: "HomeScreen" }),
-                    NavigationActions.navigate({
-                      routeName: "ReferralCreatePatientDataScreen",
-                      params: { referralType: this.state.referralType },
-                    }),
-                  ],
-                  params: {
-                    nama: this.props.navigation.getParam("user").nama,
-                  },
+                AsyncStorage.getItem("user").then((result) => {
+                  let user = JSON.parse(result);
+                  let nama = user.nama;
+                  const resetAction = StackActions.reset({
+                    index: 1,
+                    actions: [
+                      NavigationActions.navigate({
+                        routeName: "HomeScreen",
+                        params: { nama: nama },
+                      }),
+                      NavigationActions.navigate({
+                        routeName: "ReferralCreatePatientDataScreen",
+                        params: { referralType: this.state.referralType },
+                      }),
+                    ],
+                  });
+                  this.props.navigation.dispatch(resetAction);
                 });
-                this.props.navigation.dispatch(resetAction);
               }}
               style={{
                 justifyContent: "center",
@@ -122,18 +127,29 @@ class ReferralCreateFinish extends Component {
           >
             <TouchableOpacity
               onPress={() => {
-                const resetAction = StackActions.reset({
-                  index: 0,
-                  actions: [
-                    NavigationActions.navigate({
-                      routeName: "HomeScreen",
-                      params: {
-                        nama: this.props.navigation.getParam("user").nama,
-                      },
-                    }),
-                  ],
+                AsyncStorage.getItem("user").then((result) => {
+                  let user = JSON.parse(result);
+                  let routeName = "";
+                  let nama = "";
+                  if (user) {
+                    routeName = "HomeScreen";
+                    nama = user.nama;
+                  } else {
+                    routeName = "LoginScreen";
+                  }
+                  const resetAction = StackActions.reset({
+                    index: 0,
+                    actions: [
+                      NavigationActions.navigate({
+                        routeName: routeName,
+                        params: {
+                          nama: nama,
+                        },
+                      }),
+                    ],
+                  });
+                  this.props.navigation.dispatch(resetAction);
                 });
-                this.props.navigation.dispatch(resetAction);
               }}
               style={{
                 justifyContent: "center",

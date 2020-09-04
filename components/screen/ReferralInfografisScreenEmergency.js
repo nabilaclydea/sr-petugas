@@ -23,217 +23,288 @@ class ReferralInfografisScreenEmergency extends React.PureComponent {
     header: null,
   };
 
-  state={
-    items:[
-      {name:"ICU",count:0},
-      {name:"NICU",count:0},
-      {name:"PICU",count:0},
-      {name:"HICU",count:0},
-      {name:"ICCU",count:0},
-      {name:"PONEK",count:0},
-      {name:"Kelas III",count:0},
-      {name:"Kelas II",count:0},
-      {name:"Kelas I",count:0},
-      {name:"Kelas VIP",count:0},
-      {name:"Poliklinik",count:0},
-      {name:"IGD",count:0}
+  state = {
+    items: [
+      { name: "ICU", count: 0 },
+      { name: "NICU", count: 0 },
+      { name: "PICU", count: 0 },
+      { name: "HICU", count: 0 },
+      { name: "ICCU", count: 0 },
+      { name: "PONEK", count: 0 },
+      { name: "Kelas III", count: 0 },
+      { name: "Kelas II", count: 0 },
+      { name: "Kelas I", count: 0 },
+      { name: "Kelas VIP", count: 0 },
+      { name: "Poliklinik", count: 0 },
+      { name: "IGD", count: 0 },
     ],
-    sortedItems:[
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0}],
-    itemsOut:[
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0}],
-    itemsIn:[
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0}],
-    diagnosisItems:[
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0}],
-    sortedItemsOut:[
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0}],
-    sortedItemsIn:[
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0}],
-    sortedDiagnosisItems:[
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0},
-      {name:"",count:0}]
+    sortedItems: [
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+    ],
+    itemsOut: [
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+    ],
+    itemsIn: [
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+    ],
+    diagnosisItems: [
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+    ],
+    sortedItemsOut: [
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+    ],
+    sortedItemsIn: [
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+    ],
+    sortedDiagnosisItems: [
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+      { name: "", count: 0 },
+    ],
   };
 
-  componentDidMount(){
-    for(i=0;i<3000;i++){
-      HealthcareAPI.get('/referral/emergency/in?id='+i).then(response => {
-        for(j=0;j<response.data.length;j++){
-          var index=null;
-          var indexOut=null;
-          var indexIn=null;
-          var indexDiagnosis=null;
-          const tipeRuangan=response.data[j].ruangan.namaTipeRuangan
-          const namaRSout=response.data[j].faskesAsal.nama
-          const namaRSin=response.data[j].faskesTujuan.nama
-          const namaDiagnosis=response.data[j].rekamMedis.diagnosisText
-          this.state.items.some(function(item, n){
-            if(item.name==tipeRuangan){
-              index=n
-              return true
+  componentDidMount() {
+    for (i = 0; i < 3000; i++) {
+      HealthcareAPI.get("/referral/emergency/in?id=" + i).then((response) => {
+        for (j = 0; j < response.data.length; j++) {
+          var index = null;
+          var indexOut = null;
+          var indexIn = null;
+          var indexDiagnosis = null;
+          const tipeRuangan = response.data[j].ruangan.namaTipeRuangan;
+          const namaRSout = response.data[j].faskesAsal.nama;
+          const namaRSin = response.data[j].faskesTujuan.nama;
+          const namaDiagnosis = response.data[j].rekamMedis.diagnosisText;
+          this.state.items.some(function (item, n) {
+            if (item.name == tipeRuangan) {
+              index = n;
+              return true;
             }
-          })
-          this.state.itemsOut.some(function(item, n){
-            if(item.name==namaRSout){
-              indexOut=n
-              return true
+          });
+          this.state.itemsOut.some(function (item, n) {
+            if (item.name == namaRSout) {
+              indexOut = n;
+              return true;
             }
-          })
-          this.state.itemsIn.some(function(item, n){
-            if(item.name==namaRSin){
-              indexIn=n
-              return true
+          });
+          this.state.itemsIn.some(function (item, n) {
+            if (item.name == namaRSin) {
+              indexIn = n;
+              return true;
             }
-          })
-          this.state.diagnosisItems.some(function(item, n){
-            if(item.name==namaDiagnosis){
-              indexDiagnosis=n
-              return true
+          });
+          this.state.diagnosisItems.some(function (item, n) {
+            if (item.name == namaDiagnosis) {
+              indexDiagnosis = n;
+              return true;
             }
-          })
-          if(indexOut!=null){
-            this.state.itemsOut[indexOut].count+=1
-            this.forceUpdate()
+          });
+          if (indexOut != null) {
+            this.state.itemsOut[indexOut].count += 1;
+            this.forceUpdate();
+          } else {
+            const addToItems = [{ name: namaRSout, count: 1 }];
+            this.setState({ itemsOut: this.state.itemsOut.concat(addToItems) });
           }
-          else{
-            const addToItems=[{name:namaRSout, count:1}]
-            this.setState({itemsOut:this.state.itemsOut.concat(addToItems)})
+          if (indexIn != null) {
+            this.state.itemsIn[indexIn].count += 1;
+            this.forceUpdate();
+          } else {
+            const addToItems = [{ name: namaRSin, count: 1 }];
+            this.setState({ itemsIn: this.state.itemsIn.concat(addToItems) });
           }
-          if(indexIn!=null){
-            this.state.itemsIn[indexIn].count+=1
-            this.forceUpdate()
+          if (indexDiagnosis != null) {
+            this.state.diagnosisItems[indexDiagnosis].count += 1;
+            this.forceUpdate();
+          } else {
+            const addToItems = [{ name: namaDiagnosis, count: 1 }];
+            this.setState({
+              diagnosisItems: this.state.diagnosisItems.concat(addToItems),
+            });
           }
-          else{
-            const addToItems=[{name:namaRSin, count:1}]
-            this.setState({itemsIn:this.state.itemsIn.concat(addToItems)})
-          }
-          if(indexDiagnosis!=null){
-            this.state.diagnosisItems[indexDiagnosis].count+=1
-            this.forceUpdate()
-          }
-          else{
-            const addToItems=[{name:namaDiagnosis, count:1}]
-            this.setState({diagnosisItems:this.state.diagnosisItems.concat(addToItems)})
-          }
-          this.state.items[index].count+=1
-          this.forceUpdate()
-          this.sortIt()
+          this.state.items[index].count += 1;
+          this.forceUpdate();
+          this.sortIt();
         }
-      })
+      });
     }
   }
 
-  sortIt(){
-    const sorting=this.state.items.sort(function(a,b){
-      return parseInt(a.count)<parseInt(b.count);
-    })
+  sortIt() {
+    const sorting = this.state.items.sort(function (a, b) {
+      return parseInt(a.count) < parseInt(b.count);
+    });
 
-    const sortingOut=this.state.itemsOut.sort(function(a,b){
-      return parseInt(a.count)<parseInt(b.count);
-    })
-    
-    const sortingIn=this.state.itemsIn.sort(function(a,b){
-      return parseInt(a.count)<parseInt(b.count);
-    })
-    
-    const sortingDiagnosis=this.state.diagnosisItems.sort(function(a,b){
-      return parseInt(a.count)<parseInt(b.count);
-    })
-    this.setState({sortedItems:sorting, sortedItemsOut:sortingOut, sortedItemsIn:sortingIn, sortedDiagnosisItems:sortingDiagnosis})
+    const sortingOut = this.state.itemsOut.sort(function (a, b) {
+      return parseInt(a.count) < parseInt(b.count);
+    });
+
+    const sortingIn = this.state.itemsIn.sort(function (a, b) {
+      return parseInt(a.count) < parseInt(b.count);
+    });
+
+    const sortingDiagnosis = this.state.diagnosisItems.sort(function (a, b) {
+      return parseInt(a.count) < parseInt(b.count);
+    });
+    this.setState({
+      sortedItems: sorting,
+      sortedItemsOut: sortingOut,
+      sortedItemsIn: sortingIn,
+      sortedDiagnosisItems: sortingDiagnosis,
+    });
   }
 
   render() {
     const data1 = [
       {
         value: this.state.sortedItems[0].count,
-        label: this.state.sortedItems[0].name+" ("+this.state.sortedItems[0].count+")",
+        label:
+          this.state.sortedItems[0].name +
+          " (" +
+          this.state.sortedItems[0].count +
+          ")",
       },
       {
         value: this.state.sortedItems[1].count,
-        label: this.state.sortedItems[1].name+" ("+this.state.sortedItems[1].count+")",
+        label:
+          this.state.sortedItems[1].name +
+          " (" +
+          this.state.sortedItems[1].count +
+          ")",
       },
       {
         value: this.state.sortedItems[2].count,
-        label: this.state.sortedItems[2].name+" ("+this.state.sortedItems[2].count+")",
+        label:
+          this.state.sortedItems[2].name +
+          " (" +
+          this.state.sortedItems[2].count +
+          ")",
       },
       {
         value: this.state.sortedItems[3].count,
-        label: this.state.sortedItems[3].name+" ("+this.state.sortedItems[3].count+")",
+        label:
+          this.state.sortedItems[3].name +
+          " (" +
+          this.state.sortedItems[3].count +
+          ")",
       },
       {
         value: this.state.sortedItems[4].count,
-        label: this.state.sortedItems[4].name+" ("+this.state.sortedItems[4].count+")",
+        label:
+          this.state.sortedItems[4].name +
+          " (" +
+          this.state.sortedItems[4].count +
+          ")",
       },
     ];
     const data2 = [
       {
         value: this.state.sortedItemsIn[0].count,
-        label: this.state.sortedItemsIn[0].name+" ("+this.state.sortedItemsIn[0].count+")",
+        label:
+          this.state.sortedItemsIn[0].name +
+          " (" +
+          this.state.sortedItemsIn[0].count +
+          ")",
       },
       {
         value: this.state.sortedItemsIn[1].count,
-        label: this.state.sortedItemsIn[1].name+" ("+this.state.sortedItemsIn[1].count+")",
+        label:
+          this.state.sortedItemsIn[1].name +
+          " (" +
+          this.state.sortedItemsIn[1].count +
+          ")",
       },
       {
         value: this.state.sortedItemsIn[2].count,
-        label: this.state.sortedItemsIn[2].name+" ("+this.state.sortedItemsIn[2].count+")",
+        label:
+          this.state.sortedItemsIn[2].name +
+          " (" +
+          this.state.sortedItemsIn[2].count +
+          ")",
       },
       {
         value: this.state.sortedItemsIn[3].count,
-        label: this.state.sortedItemsIn[3].name+" ("+this.state.sortedItemsIn[3].count+")",
+        label:
+          this.state.sortedItemsIn[3].name +
+          " (" +
+          this.state.sortedItemsIn[3].count +
+          ")",
       },
       {
         value: this.state.sortedItemsIn[4].count,
-        label: this.state.sortedItemsIn[4].name+" ("+this.state.sortedItemsIn[4].count+")",
+        label:
+          this.state.sortedItemsIn[4].name +
+          " (" +
+          this.state.sortedItemsIn[4].count +
+          ")",
       },
     ];
     const data3 = [
       {
         value: this.state.sortedItemsOut[0].count,
-        label: this.state.sortedItemsOut[0].name+" ("+this.state.sortedItemsOut[0].count+")",
+        label:
+          this.state.sortedItemsOut[0].name +
+          " (" +
+          this.state.sortedItemsOut[0].count +
+          ")",
       },
       {
         value: this.state.sortedItemsOut[1].count,
-        label: this.state.sortedItemsOut[1].name+" ("+this.state.sortedItemsOut[1].count+")",
+        label:
+          this.state.sortedItemsOut[1].name +
+          " (" +
+          this.state.sortedItemsOut[1].count +
+          ")",
       },
       {
         value: this.state.sortedItemsOut[2].count,
-        label: this.state.sortedItemsOut[2].name+" ("+this.state.sortedItemsOut[2].count+")",
+        label:
+          this.state.sortedItemsOut[2].name +
+          " (" +
+          this.state.sortedItemsOut[2].count +
+          ")",
       },
       {
         value: this.state.sortedItemsOut[3].count,
-        label: this.state.sortedItemsOut[3].name+" ("+this.state.sortedItemsOut[3].count+")",
+        label:
+          this.state.sortedItemsOut[3].name +
+          " (" +
+          this.state.sortedItemsOut[3].count +
+          ")",
       },
       {
         value: this.state.sortedItemsOut[4].count,
-        label: this.state.sortedItemsOut[4].name+" ("+this.state.sortedItemsOut[4].count+")",
+        label:
+          this.state.sortedItemsOut[4].name +
+          " (" +
+          this.state.sortedItemsOut[4].count +
+          ")",
       },
     ];
     return (
